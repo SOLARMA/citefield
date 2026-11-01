@@ -176,9 +176,11 @@ A run makes `chunks × field batches × n_runs` extraction calls, plus one propo
 - `evidence`: a quote with its page, or a table cell as table id + row label + column label + cell text
 - `model_confidence`: the model's own 0–1 estimate
 
-**4. Post-process in code.** A candidate without evidence is dropped. Every other candidate is kept and its evidence verified (see signals), so a value whose quote can't be found stays visible to the reviewer, with its low `evidence_match` and an `evidence_not_verified` warning when the best match is below `fuzzy_min_ratio`. An enum value is matched to the allowed `values` case-insensitively; a value outside them keeps `value: null` and gets an `enum_value_unknown` warning. Parse numbers with `number_locale`; an ambiguous form such as "24.000" with `auto` gets a warning rather than a silent choice. Convert units with pint: a converted value gets status `derived` and a human-readable `derivation`, an unconverted one `found`. A value without a unit for a field that has one keeps `value: null` and `unit_resolved: false`; the unit is never assumed.
+**4. Post-process in code.** A candidate without evidence is dropped. Every other candidate is kept and its evidence verified (see signals), so a value whose quote can't be found stays visible to the reviewer, with its low `evidence_match` and an `evidence_not_verified` warning when the best match is below `fuzzy_min_ratio`. An enum value is matched to the allowed `values` case-insensitively; a value outside them keeps `value: null` and gets an `enum_value_unknown` warning. Parse numbers with `number_locale`. Under `auto`, a number whose only separator is a single `.` or `,` followed by exactly three digits, such as "24.000" or "1,140", keeps `value: null` and gets an `ambiguous_number` warning rather than a silent choice; every other form is read the one way it can be. Values are scalar: a range ("25-60 psi") or tolerance ("15 ±3 psi") keeps `value: null` and gets a `number_not_scalar` warning. Convert units with pint: a converted value gets status `derived`, a human-readable `derivation`, and is rounded to the raw value's significant figures plus one; a value already in the field's unit is `found`. A value without a unit for a field that has one keeps `value: null` and `unit_resolved: false`; the unit is never assumed.
 
-**5. Merge across chunks and runs.** Candidates are grouped by normalized value and normalized context.
+Decision records: [ADR-0020](adr/0020-keep-number-values-scalar-and-leave-ranges-unparsed.md) (scalar values), [ADR-0021](adr/0021-round-converted-numbers-and-treat-numbers-within-1-percent-as-the-same-value.md) (rounding), [ADR-0022](adr/0022-leave-ambiguous-numbers-unparsed-under-auto-locale.md) (`auto` locale).
+
+**5. Merge across chunks and runs.** Candidates are grouped by normalized value and normalized context. Two numbers within 1% of the larger are the same value, so "1,140 lb. (516.4 kg)" gives one value with both quotes; its raw value and unit come from the first candidate stated in the field's unit, or the first candidate if none is ([ADR-0021](adr/0021-round-converted-numbers-and-treat-numbers-within-1-percent-as-the-same-value.md)).
 
 - Same value, same context: one value, all evidence kept.
 - Different values, different contexts: a list (e.g. one speed per bottle format). Not a conflict.
@@ -304,7 +306,7 @@ One JSON file per document, defined by pydantic models; the repo publishes the g
 }
 ```
 
-**Stable ids.** `value_id` is a hash of field name, normalized value and normalized context, so re-runs can match values across runs. `document_id` defaults to the file name and can be set by the user to link revisions of the same manual.
+**Stable ids.** `value_id` is a hash of field name, normalized value and normalized context, so re-runs can match values across runs. For a number, the value hashed is the merged value's, so the id depends on which form represents it; carry-over compares numbers within the same 1% as merging. `document_id` defaults to the file name and can be set by the user to link revisions of the same manual.
 
 ## Review, re-extraction and evaluation
 
@@ -325,7 +327,7 @@ Values the reviewer `added` are kept even if the new run misses them. Known trad
 
 **Evaluation.** The golden set is every reviewed value across a folder of outputs: accepted, edited and added values are positives; rejected values, and the original of an edited value, are negatives; fields reviewed as absent count for `not_found`. `citefield eval` re-runs extraction on those documents with the current config, model and parser, finding each manual at its recorded path or by SHA-256 in `--documents`. With `--predictions`, it scores outputs already saved by `citefield extract` instead, so a model comparison runs extraction once per model. Decision record: [ADR-0016](adr/0016-let-eval-score-saved-outputs.md).
 
-A prediction matches a golden value on field and a match key that is looser than the one behind `value_id`: text casefolded, without whitespace, ®, ™ or ©, with straight quotes and no trailing footnote asterisks, and for string fields with the raw unit appended (`18.92lb` matches `18.92` with unit `lb`). It also matches any of the value's `equivalents`, and several predicted forms of one golden value count once. A form is equivalent when it states the same fact: other notation, a unit or conversion the manual states, trademark or marketing words, footnote marks, or extra detail of that fact from the same passage. Context is not part of the match, and matches whose contexts differ are counted as `context_mismatches`. A field counts in a document only when it is fully reviewed: no pending values, and at least one reviewed value or confirmed absent. Then every prediction that matches no positive is a false positive, and those that match no negative either are listed as unjudged, ready to review into the golden set. Decision record: [ADR-0017](adr/0017-match-eval-values-loosely-and-accept-reviewed-equivalents.md). The report gives, per field and in total:
+A prediction matches a golden value on field and a match key that is looser than the one behind `value_id`: text casefolded, without whitespace, ®, ™ or ©, with straight quotes and no trailing footnote asterisks, and for string fields with the raw unit appended (`18.92lb` matches `18.92` with unit `lb`). Number and integer values match when they are within 1% in the field's unit, and their equivalents (such as `516.4 kg`) are parsed and converted like raw values; values that stay null fall back to the text key ([ADR-0021](adr/0021-round-converted-numbers-and-treat-numbers-within-1-percent-as-the-same-value.md)). It also matches any of the value's `equivalents`, and several predicted forms of one golden value count once. A form is equivalent when it states the same fact: other notation, a unit or conversion the manual states, trademark or marketing words, footnote marks, or extra detail of that fact from the same passage. Context is not part of the match, and matches whose contexts differ are counted as `context_mismatches`. A field counts in a document only when it is fully reviewed: no pending values, and at least one reviewed value or confirmed absent. Then every prediction that matches no positive is a false positive, and those that match no negative either are listed as unjudged, ready to review into the golden set. Decision record: [ADR-0017](adr/0017-match-eval-values-loosely-and-accept-reviewed-equivalents.md). The report gives, per field and in total:
 
 - precision and recall of values
 - accuracy of `not_found`: the share of confirmed-absent fields predicted with no values
@@ -410,6 +412,7 @@ v1 is a library plus CLI for PDF and Markdown that extracts, verifies, merges, p
 | ---------- | ------------------------------------------------------------------ | -------------------------------------------------------------------- |
 | Formats    | PDF (pdfplumber default; docling, pypdf, PyMuPDF extras), Markdown | DOCX and others via docling                                          |
 | Content    | Text and tables                                                    | Vision pass for diagrams and scanned pages                           |
+| Values     | Scalar numbers; ranges and tolerances stay unparsed                | A range value type                                                   |
 | Extraction | Chunking, field batches, `n_runs`, proposals                       | Retrieval for very large documents                                   |
 | Confidence | Five named signals, no aggregate                                   | Optional helper outside the core to fit weights on the golden set    |
 | Review     | Review fields, `apply_review`, carry-over                          | Review UI; audit sampling of carried-over values                     |
@@ -418,7 +421,7 @@ v1 is a library plus CLI for PDF and Markdown that extracts, verifies, merges, p
 
 **Open questions**
 
-- [ ] Number locale: with `auto`, should "24.000" follow the document's detected language or always warn?
+- [x] Number locale: with `auto`, should "24.000" follow the document's detected language or always warn? Always warn, until the corpus has a non-English manual: [ADR-0022](adr/0022-leave-ambiguous-numbers-unparsed-under-auto-locale.md).
 - [ ] Merge context matching: is exact normalized-string matching good enough, or does it need fuzzy matching?
 - [ ] Document identity across revisions: user-set `document_id` only, or also infer it from file names?
 - [ ] Token counting for arbitrary models: LiteLLM's counter, or a conservative character heuristic as fallback?

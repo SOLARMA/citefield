@@ -157,6 +157,22 @@ def value_key(value: ScalarValue, raw_value: str) -> ScalarValue:
     return normalize_text(key) if isinstance(key, str) else key
 
 
+# Two numbers within this share of the larger magnitude are the same value (ADR-0021).
+NUMBER_TOLERANCE = 0.01
+
+
+def same_value(a: ScalarValue, a_raw: str, b: ScalarValue, b_raw: str) -> bool:
+    """Whether two values are the same: numbers within `NUMBER_TOLERANCE`, others by
+    `value_key`."""
+    if _is_number(a) and _is_number(b):
+        return abs(a - b) <= NUMBER_TOLERANCE * max(abs(a), abs(b))
+    return value_key(a, a_raw) == value_key(b, b_raw)
+
+
+def _is_number(value: ScalarValue) -> bool:
+    return isinstance(value, int | float) and not isinstance(value, bool)
+
+
 def make_value_id(field: str, value: ScalarValue, raw_value: str, context: str | None) -> str:
     """Stable id from field name, normalized value and normalized context."""
     norm_context = normalize_text(context) if context else None

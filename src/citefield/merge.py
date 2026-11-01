@@ -14,7 +14,7 @@ from citefield.output import (
     ValueStatus,
     make_value_id,
     normalize_text,
-    value_key,
+    same_value,
 )
 
 
@@ -36,15 +36,27 @@ class Draft:
 
 
 def merge(field_name: str, drafts: list[Draft]) -> list[Value]:
-    """Group drafts by normalized value and context; keep all their evidence."""
-    groups: dict[str, list[Draft]] = {}
+    """Group drafts by value and normalized context; keep all their evidence.
+
+    Numbers within 1% are the same value (ADR-0021). Each group's value comes from its
+    representative: the first draft stated in the field's unit, or the first draft.
+    """
+    groups: list[list[Draft]] = []
     for draft in drafts:
-        value_id = make_value_id(field_name, draft.value, draft.raw_value, draft.context)
-        groups.setdefault(value_id, []).append(draft)
+        for group in groups:
+            first = group[0]  # compare with the first, so groups don't drift by chaining
+            if _context_key(first) == _context_key(draft) and same_value(
+                first.value, first.raw_value, draft.value, draft.raw_value
+            ):
+                group.append(draft)
+                break
+        else:
+            groups.append([draft])
 
     values = []
-    for value_id, group in groups.items():
-        first = group[0]
+    for group in groups:
+        rep = next((d for d in group if d.status == "found" and d.unit is not None), group[0])
+        value_id = make_value_id(field_name, rep.value, rep.raw_value, rep.context)
         evidence: dict[tuple[int, str], float] = {}
         for draft in group:
             for item, match in zip(draft.evidence, draft.matches, strict=True):
@@ -54,19 +66,19 @@ def merge(field_name: str, drafts: list[Draft]) -> list[Value]:
         values.append(
             Value(
                 value_id=value_id,
-                status=first.status,
-                raw_value=first.raw_value,
-                raw_unit=first.raw_unit,
-                value=first.value,
-                unit=first.unit,
-                derivation=first.derivation,
-                context=first.context,
+                status=rep.status,
+                raw_value=rep.raw_value,
+                raw_unit=rep.raw_unit,
+                value=rep.value,
+                unit=rep.unit,
+                derivation=rep.derivation,
+                context=rep.context,
                 evidence=[QuoteEvidence(page=page, quote=quote) for page, quote in evidence],
                 signals=Signals(
                     evidence_match=max(evidence.values(), default=0.0),
                     citation_count=len({page for page, _ in evidence}),
                     model_confidence=max(confidences) if confidences else None,
-                    unit_resolved=first.unit_resolved,
+                    unit_resolved=rep.unit_resolved,
                 ),
             )
         )
@@ -75,11 +87,11 @@ def merge(field_name: str, drafts: list[Draft]) -> list[Value]:
 
 def field_status(values: list[Value]) -> FieldStatus:
     """`not_found` with no values; `conflict` when two different values share a context, or
-    either has none; `found` otherwise."""
+    either has none; `found` otherwise. Numbers within 1% aren't different (ADR-0021)."""
     if not values:
         return "not_found"
     for a, b in combinations(values, 2):
-        if value_key(a.value, a.raw_value) == value_key(b.value, b.raw_value):
+        if same_value(a.value, a.raw_value, b.value, b.raw_value):
             continue
         if (
             a.context is None
@@ -88,3 +100,7 @@ def field_status(values: list[Value]) -> FieldStatus:
         ):
             return "conflict"
     return "found"
+
+
+def _context_key(draft: Draft) -> str | None:
+    return normalize_text(draft.context) if draft.context else None

@@ -5,10 +5,10 @@
 | [design.md](design.md)         | The current design: architecture, config, output, API. Kept up to date.     |
 | [adr/](adr/README.md)          | Architecture decision records: why the design is the way it is. Append-only. |
 | [evaluations/](evaluations/model-bakeoff-2026-10.md) | Evaluation reports, such as model comparisons on the golden set. |
+| [guides/](guides/getting-started.md) | Task-oriented how-tos for users, starting with getting started. |
 
-Folders are added when they have content. The planned ones are:
+Folders are added when they have content. The planned one is:
 
-- `guides/`: task-oriented how-tos for users (writing a field config, running a review loop).
 - `reference/`: config schema, CLI and output JSON reference, generated from code where possible.
 
 **Keeping docs in order**

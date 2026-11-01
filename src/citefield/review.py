@@ -10,7 +10,7 @@ from typing import Any, Literal
 import yaml
 from pydantic import BaseModel, model_validator
 
-from citefield.config import Config
+from citefield.config import Config, FieldDef
 from citefield.merge import field_status
 from citefield.output import (
     ExtractionResult,
@@ -104,6 +104,7 @@ def apply_review(
     decisions = Decisions.model_validate(decisions)
     reviewer = decisions.reviewer
     reviewed_at = decisions.reviewed_at or datetime.now().astimezone()
+    fdefs = {f.name: f for f in config.fields} if config else {}
 
     for name, decision in decisions.fields.items():
         try:
@@ -126,16 +127,10 @@ def apply_review(
                     "note": item.note,
                 }
             )
-        fdef = next((f for f in config.fields if f.name == name), None) if config else None
         for added in decision.added:
-            if added.value is None and config is not None and fdef is not None:
-                locale = config.settings.extraction.number_locale
-                parsed = parse_value(fdef, added.raw_value, added.raw_unit, locale, config.units)
-                if parsed.warning is not None and parsed.warning not in result.warnings:
-                    result.warnings.append(parsed.warning)  # once, if applied again
-            else:  # the reviewer's own value, or the raw value as written
-                value = added.raw_value if added.value is None else added.value
-                parsed = ParsedValue(value, unit=added.unit)
+            parsed = _parse_added(added, fdefs.get(name), config)
+            if parsed.warning is not None and parsed.warning not in result.warnings:
+                result.warnings.append(parsed.warning)  # once, if applied again
             value = _added_value(
                 name, added, parsed, reviewer, reviewed_at, pages or {}, page_window
             )
@@ -167,6 +162,16 @@ def apply_review(
         elif decision.status == "pending":
             field.review = FieldReview(note=decision.note)
     return result
+
+
+def _parse_added(added: AddedValue, fdef: FieldDef | None, config: Config | None) -> ParsedValue:
+    """An added value parsed like an extracted one when the config is given; otherwise the
+    reviewer's own value, or the raw value as written."""
+    if added.value is None and config is not None and fdef is not None:
+        locale = config.settings.extraction.number_locale
+        return parse_value(fdef, added.raw_value, added.raw_unit, locale, config.units)
+    value = added.raw_value if added.value is None else added.value
+    return ParsedValue(value, unit=added.unit)
 
 
 def _added_value(

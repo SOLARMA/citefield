@@ -185,11 +185,16 @@ class NumberKey:
 
 def number_key(v: _Parsed) -> NumberKey | None:
     """The `NumberKey` of a parsed value, or None when its value isn't a number."""
-    if not is_number(v.value):
+    return make_number_key(v.value, v.raw_value, v.status)
+
+
+def make_number_key(value: ScalarValue, raw: str, status: ValueStatus) -> NumberKey | None:
+    """The `NumberKey` of `value` parsed from `raw`, or None when it isn't a number."""
+    if not is_number(value):
         return None
-    if v.status == "derived":
-        return NumberKey(v.value, derived=True)
-    return NumberKey(v.value, written_precision(v.raw_value, v.value))
+    if status == "derived":
+        return NumberKey(value, derived=True)
+    return NumberKey(value, written_precision(raw, value))
 
 
 def written_precision(raw: str, value: float) -> float:

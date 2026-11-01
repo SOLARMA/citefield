@@ -42,18 +42,19 @@ def merge(field_name: str, drafts: list[Draft]) -> list[Value]:
     the same value (ADR-0021). Each group's value comes from its
     representative: the first draft stated in the field's unit, or the first draft.
     """
-    groups: list[list[Draft]] = []
+    groups: list[tuple[str | None, list[Draft]]] = []  # in order of first appearance
     for draft in drafts:
-        for group in groups:
-            first = group[0]  # compare with the first, so groups don't drift by chaining
-            if _context_key(first) == _context_key(draft) and same_value(first, draft):
+        context = _context_key(draft)
+        for group_context, group in groups:
+            # compare with the first, so groups don't drift by chaining
+            if group_context == context and same_value(group[0], draft):
                 group.append(draft)
                 break
         else:
-            groups.append([draft])
+            groups.append((context, [draft]))
 
     values = []
-    for group in groups:
+    for _, group in groups:
         rep = next((d for d in group if d.status == "found" and d.unit is not None), group[0])
         value_id = make_value_id(field_name, rep.value, rep.raw_value, rep.context)
         evidence: dict[tuple[int, str], float] = {}

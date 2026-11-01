@@ -19,10 +19,10 @@ from citefield.output import (
     ScalarValue,
     TokenUsage,
     Value,
+    make_number_key,
     normalize_text,
     number_key,
     numbers_match,
-    written_precision,
 )
 from citefield.verify import parse_value
 
@@ -441,11 +441,7 @@ def _form_key(fdef: FieldDef, form: ScalarValue, config: Config) -> Key | None:
         return NumberKey(form) if form is not None else None  # a number, without its text
     locale = config.settings.extraction.number_locale
     parsed = parse_value(fdef, form, None, locale, config.units)
-    if parsed.value is None:
-        return None
-    if parsed.status == "derived":
-        return NumberKey(parsed.value, derived=True)
-    return NumberKey(parsed.value, written_precision(form, parsed.value))
+    return make_number_key(parsed.value, form, parsed.status)
 
 
 _MISSING = object()
@@ -454,8 +450,10 @@ _MISSING = object()
 def _find(keys: Collection[Key], key: Key, default: object = _MISSING) -> object:
     """The key in `keys` that `key` matches: itself, or for a number the closest one that
     `numbers_match` (ADR-0021); `default` when none does."""
+    if key in keys:
+        return key
     if not isinstance(key, NumberKey):
-        return key if key in keys else default
+        return default
     close = [k for k in keys if isinstance(k, NumberKey) and numbers_match(k, key)]
     return min(close, key=lambda k: abs(k.value - key.value)) if close else default
 

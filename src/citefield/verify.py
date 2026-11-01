@@ -36,6 +36,10 @@ _DECIMAL_MARK = {"en": ".", "it": ",", "de": ","}
 # A number followed by its unit, as in a raw value "1,140 lb." with no raw unit.
 _NUMBER_AND_UNIT = re.compile(r"(.*?\d\*?)\s*([^\d\s.,+\-−±*].*)")
 
+_UNIT_DOTS = re.compile(r"(?<=[A-Za-z])\.")  # "lb.", "cu. in."
+_UNIT_PER = re.compile(r"\s+per\s+")
+_UNIT_DEGREES = re.compile(r"(°|\bdeg)\s+(?=[CFK]\b)")  # "° F", "deg F"
+
 # Unit spellings from manuals that pint doesn't know or misreads, after `clean_unit`'s
 # other steps. The dimension check catches misreadings this table misses ("cu in" parses
 # as centi-atomic-mass-unit × inch), so it only has to cover common spellings.
@@ -85,11 +89,21 @@ def parse_number(text: str, locale: NumberLocale = "auto") -> int | float:
     return readings.pop()
 
 
+def _number_pattern(mark: str) -> re.Pattern[str]:
+    sep = "," if mark == "." else "."
+    return re.compile(
+        rf"([+-]?)({_GROUPED.format(sep=re.escape(sep))})?(?:{re.escape(mark)}(\d+))?"
+    )
+
+
+# A signed number with `mark` as its decimal mark: sign, integer part, decimals.
+_NUMBER_PATTERNS = {mark: _number_pattern(mark) for mark in (".", ",")}
+
+
 def _read_number(body: str, mark: str) -> int | float | None:
     """`body` read with `mark` as the decimal mark, or None if it isn't valid that way."""
     sep = "," if mark == "." else "."
-    pattern = rf"([+-]?)({_GROUPED.format(sep=re.escape(sep))})?(?:{re.escape(mark)}(\d+))?"
-    match = re.fullmatch(pattern, body)
+    match = _NUMBER_PATTERNS[mark].fullmatch(body)
     if match is None or not (match[2] or match[3]):
         return None
     number = float(f"{match[1]}{(match[2] or '0').replace(sep, '')}.{match[3] or '0'}")
@@ -148,9 +162,9 @@ def parse_value(
 
 def clean_unit(text: str) -> str:
     """A unit as written in a manual, in a form pint parses: "gal. per hour" is "gal/hour"."""
-    unit = re.sub(r"(?<=[A-Za-z])\.", "", text)  # "lb.", "cu. in."
-    unit = re.sub(r"\s+per\s+", "/", unit.strip())
-    unit = re.sub(r"(°|\bdeg)\s+(?=[CFK]\b)", "°", unit)  # "° F", "deg F"
+    unit = _UNIT_DOTS.sub("", text)
+    unit = _UNIT_PER.sub("/", unit.strip())
+    unit = _UNIT_DEGREES.sub("°", unit)
     unit = " ".join(unit.split())
     return _UNIT_ALIASES.get(unit, unit)
 

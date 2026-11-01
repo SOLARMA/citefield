@@ -183,16 +183,58 @@ def test_unexpected_field_warns(manual):
 
 
 def test_unsupported_types_keep_raw_value(manual):
+    fields = [{"name": "has_wheels", "description": "Wheels.", "type": "boolean"}]
+    response = {"fields": [answer("has_wheels", candidate("yes", (2, "Manufacturer Onan")))]}
+    result = extractor(response, fields=fields).extract(manual)
+    assert result.field("has_wheels").values[0].value is None
+    assert any(w.code == "unsupported_field_type" for w in result.warnings)
+
+
+def test_numbers_are_converted_to_the_field_unit(manual):
     fields = [{"name": "dry_weight", "description": "Dry weight.", "type": "number", "unit": "kg"}]
     response = {
         "fields": [
-            answer("dry_weight", candidate("516.4", (2, "Manufacturer Onan"), raw_unit="kg"))
+            answer("dry_weight", candidate("1,140", (2, "Manufacturer Onan"), raw_unit="lb."))
         ]
     }
-    result = extractor(response, fields=fields).extract(manual)
-    value = result.field("dry_weight").values[0]
-    assert (value.raw_value, value.raw_unit, value.value) == ("516.4", "kg", None)
-    assert any(w.code == "unsupported_field_type" for w in result.warnings)
+    ex = extractor(response, fields=fields, extraction={"number_locale": "en"})
+    value = ex.extract(manual).field("dry_weight").values[0]
+    assert (value.status, value.value, value.unit) == ("derived", 517.1, "kg")
+    assert value.derivation == "1,140 lb. = 517.1 kg"
+    assert value.signals.unit_resolved is True
+
+
+@pytest.mark.parametrize(
+    "locale, value, warning", [("auto", None, "ambiguous_number"), ("en", 1140, None)]
+)
+def test_number_locale_reaches_parsing(manual, locale, value, warning):
+    fields = [{"name": "run_hours", "description": "Hours.", "type": "integer"}]
+    response = {"fields": [answer("run_hours", candidate("1,140", (2, "Manufacturer Onan")))]}
+    ex = extractor(response, fields=fields, extraction={"number_locale": locale})
+    result = ex.extract(manual)
+    assert result.field("run_hours").values[0].value == value
+    assert [w.code for w in result.warnings if w.field == "run_hours"] == (
+        [warning] if warning else []
+    )
+
+
+@pytest.mark.parametrize(
+    "locale, values, status", [("en", [516.4], "found"), ("auto", [None, 516.4], "conflict")]
+)
+def test_one_weight_in_two_units(manual, locale, values, status):
+    # ADR-0021's case: "1,140 lb. (516.4 kg)". Under auto, 1,140 is ambiguous (ADR-0022).
+    fields = [{"name": "dry_weight", "description": "Dry weight.", "type": "number", "unit": "kg"}]
+    lb = candidate("1,140", (2, "Manufacturer Onan"), raw_unit="lb.", context="MEP-803A")
+    kg = candidate("516.4", (3, "Type Pressurized"), raw_unit="kg", context="MEP-803A")
+    response = {"fields": [answer("dry_weight", lb, kg)]}
+    ex = extractor(response, fields=fields, extraction={"number_locale": locale})
+    field = ex.extract(manual).field("dry_weight")
+    assert [v.value for v in field.values] == values
+    assert field.status == status
+    if locale == "en":
+        (value,) = field.values
+        assert (value.status, value.raw_unit) == ("found", "kg")
+        assert [e.page for e in value.evidence] == [2, 3]
 
 
 def test_plan_and_too_large(manual):

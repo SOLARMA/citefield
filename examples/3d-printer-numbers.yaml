@@ -1,0 +1,46 @@
+# Number fields for the 3D printer user guide in corpus/ (LulzBot TAZ SideKick).
+# Run: citefield extract corpus/manuals/lulzbot-taz-sidekick-user-guide-v1.2.pdf -c examples/3d-printer-numbers.yaml -o out/
+schema_version: 1
+
+fields:
+  - name: net_weight
+    description: Net weight of the printer, one per model.
+    type: number
+    unit: kg
+
+  - name: max_print_surface_temperature
+    description: Maximum temperature of the print surface (build plate).
+    type: number
+    unit: degC
+
+  - name: power_supply_power
+    description: Rated power of the printer's power supply, one per model.
+    type: number
+    unit: W
+
+  - name: power_supply_output_voltage
+    description: DC output voltage of the printer's power supply.
+    type: number
+    unit: V
+
+  - name: power_supply_output_current
+    description: Rated output current of the printer's power supply, one per model.
+    type: number
+    unit: A
+
+  - name: input_voltage
+    description: AC input voltage the printer accepts.
+    type: number
+    unit: V
+
+  - name: max_print_speed
+    description: Maximum print speed.
+    type: number
+    unit: mm/s
+
+settings:
+  llm:
+    model: openrouter/anthropic/claude-haiku-5.5 # ADR-0019
+    temperature: null # not accepted by the model
+  extraction:
+    number_locale: en # the manual writes numbers the English way (ADR-0022)

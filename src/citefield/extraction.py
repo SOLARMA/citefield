@@ -114,9 +114,7 @@ class Extractor:
                     warnings.append(OutputWarning(code="unexpected_field", raw=answer.name))
                     continue
                 for candidate in answer.candidates:
-                    draft = _draft(
-                        field, candidate, pages, settings.verification.page_window, warnings
-                    )
+                    draft = _draft(field, candidate, pages, self.config, warnings)
                     if draft is not None:
                         drafts[field.name].append(draft)
 
@@ -211,7 +209,7 @@ def _draft(
     field: FieldDef,
     candidate: extract_v1.Candidate,
     pages: dict[int, str],
-    page_window: int,
+    config: Config,
     warnings: list[OutputWarning],
 ) -> Draft | None:
     """Turn one LLM candidate into a verified draft, or None if it has no usable evidence."""
@@ -224,15 +222,26 @@ def _draft(
     if not raw_value or not evidence:
         return None  # a candidate without evidence is not a value (ADR-0003)
 
-    value, warning = parse_value(field, raw_value)
-    if warning is not None:
-        warnings.append(warning)
+    settings = config.settings
+    raw_unit = (candidate.raw_unit or "").strip() or None
+    parsed = parse_value(
+        field, raw_value, raw_unit, settings.extraction.number_locale, config.units
+    )
+    if parsed.warning is not None:
+        warnings.append(parsed.warning)
     return Draft(
         raw_value=raw_value,
-        raw_unit=(candidate.raw_unit or "").strip() or None,
-        value=value,
+        raw_unit=raw_unit,
+        value=parsed.value,
+        status=parsed.status,
+        unit=parsed.unit,
+        derivation=parsed.derivation,
+        unit_resolved=parsed.unit_resolved,
         context=(candidate.context or "").strip() or None,
         evidence=evidence,
-        matches=[evidence_match(e.quote, e.page, pages, page_window=page_window) for e in evidence],
+        matches=[
+            evidence_match(e.quote, e.page, pages, page_window=settings.verification.page_window)
+            for e in evidence
+        ],
         model_confidence=min(max(candidate.model_confidence, 0.0), 1.0),
     )

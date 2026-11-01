@@ -23,7 +23,7 @@ The corpus is not part of the citefield package and does not fall under its Apac
 
 ## Golden set
 
-`golden/<config>/` holds the reviewed outputs that `citefield eval` scores against, one per manual, made with the config of the same name in [`examples/`](../examples/). Next to each output, `<document_id>.review.yaml` holds the reviewer's decisions. The outputs quote the manuals, so those quotes keep the manual's license (CC BY-SA 4.0 for the LulzBot guide). CI checks that every golden output still loads and matches its config.
+`golden/<config>/` holds the reviewed outputs that `citefield eval` scores against, one per manual, made with the config of the same name in [`examples/`](../examples/). `generator` and `3d-printer` cover string and enum fields; `generator-numbers` and `3d-printer-numbers` cover number fields with units, on the same manuals. Next to each output, `<document_id>.review.yaml` holds the reviewer's decisions. The outputs quote the manuals, so those quotes keep the manual's license (CC BY-SA 4.0 for the LulzBot guide). CI checks that every golden output still loads and matches its config.
 
 To review or extend a golden output (from the repository root):
 
@@ -33,7 +33,7 @@ To review or extend a golden output (from the repository root):
 # `also_accept`; set a field to confirmed_absent if the manual doesn't state it
 uv run python scripts/review.py apply corpus/golden/generator/tm-9-6115-642-10.json \
   corpus/golden/generator/tm-9-6115-642-10.review.yaml \
-  -o corpus/golden/generator/tm-9-6115-642-10.json
+  -o corpus/golden/generator/tm-9-6115-642-10.json -c examples/generator.yaml
 uv run citefield eval corpus/golden/generator -c examples/generator.yaml
 ```
 

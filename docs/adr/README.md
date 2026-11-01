@@ -33,4 +33,7 @@ ADRs 0002–0010 were backfilled from design.md v1.0.0 when this log started.
 | [0017](0017-match-eval-values-loosely-and-accept-reviewed-equivalents.md) | Match evaluation values on a looser key, and accept equivalent forms the reviewer declares | Accepted | 2026-10-31 |
 | [0018](0018-add-openrouter-provider-routing-and-reasoning-effort-settings.md) | Add OpenRouter provider routing and reasoning effort to the LLM settings | Accepted | 2026-10-31 |
 | [0019](0019-use-claude-haiku-5-5-as-the-default-model.md) | Use Claude Haiku 5.5 as the default model in the examples | Accepted | 2026-10-31 |
+| [0020](0020-keep-number-values-scalar-and-leave-ranges-unparsed.md) | Keep number values scalar in v1, and leave ranges and tolerances unparsed | Accepted | 2026-11-01 |
+| [0021](0021-round-converted-numbers-and-treat-numbers-within-1-percent-as-the-same-value.md) | Round converted numbers to the raw value's precision, and treat numbers within 1%, or a conversion within a stated value's precision, as the same value | Accepted | 2026-11-01 |
+| [0022](0022-leave-ambiguous-numbers-unparsed-under-auto-locale.md) | Leave ambiguous numbers unparsed under the auto number locale | Accepted | 2026-11-01 |
 <!-- adr-index:end -->

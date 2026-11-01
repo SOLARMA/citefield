@@ -4,7 +4,7 @@
 
 citefield is a Python library and CLI that reads a technical manual (PDF or Markdown), extracts the fields you define in a YAML config, and returns JSON in which every value cites a verbatim quote or table cell and its page. A human can then review the result value by value.
 
-> **Status:** early development. `citefield extract` runs end to end on PDFs for string and enum fields, with verified quotes, and `citefield eval` scores it against hand-reviewed outputs; numbers and units, tables, proposals and review carry-over come next. The plan is in [`docs/design.md`](docs/design.md), and [`examples/`](examples/) has configs for the manuals in [`corpus/`](corpus/README.md).
+> **Status:** early development. `citefield extract` runs end to end on PDFs for string, enum and number fields, with verified quotes and units converted in code, and `citefield eval` scores it against hand-reviewed outputs; tables, proposals and review carry-over come next. The plan is in [`docs/design.md`](docs/design.md), and [`examples/`](examples/) has configs for the manuals in [`corpus/`](corpus/README.md).
 
 ## Why
 
@@ -20,6 +20,10 @@ LLMs are good at finding values in long documents and bad at proving where those
 Define the fields you want:
 
 ```yaml
+units: # extra unit definitions for pint
+  - "bottle = [count]"
+  - "bph = bottle / hour"
+
 fields:
   - name: production_speed
     description: Nominal production speed of the machine in bottles per hour.
@@ -46,7 +50,7 @@ Get values with their evidence and confidence signals:
       "raw_unit": "bottles/min",
       "value": 24000,
       "unit": "bph",
-      "derivation": "400 bottles/min × 60 min/h = 24000 bph",
+      "derivation": "400 bottles/min = 24000 bph",
       "evidence": [
         {
           "kind": "quote",

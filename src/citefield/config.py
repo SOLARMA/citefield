@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 
 FieldType = Literal["number", "integer", "string", "boolean", "enum", "date"]
 ReasoningEffort = Literal["none", "minimal", "low", "medium", "high", "xhigh"]
+NumberLocale = Literal["auto", "en", "it", "de"]
 
 FIELD_NAME_RE = re.compile(r"^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$")
 
@@ -70,7 +71,7 @@ class ChunkingSettings(BaseModel):
 class ExtractionSettings(BaseModel):
     field_batch_size: int = 30
     n_runs: int = 1
-    number_locale: Literal["auto", "en", "it", "de"] = "auto"
+    number_locale: NumberLocale = "auto"
 
 
 class ProposalSettings(BaseModel):

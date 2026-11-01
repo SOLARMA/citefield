@@ -17,6 +17,7 @@ from citefield.output import (
     QuoteEvidence,
     Review,
     RunInfo,
+    ScalarValue,
     Signals,
     Value,
     make_value_id,
@@ -108,18 +109,20 @@ def value(
     review: str = "pending",
     *,
     context: str | None = None,
-    reviewed_value: str | None = None,
+    reviewed_value: ScalarValue = None,
     raw_unit: str | None = None,
     equivalents: tuple[str, ...] = (),
     evidence_match: float = 1.0,
     confidence: float | None = 0.9,
+    parsed: ScalarValue = None,  # the typed value; defaults to raw_value
 ) -> Value:
+    typed = raw_value if parsed is None else parsed
     return Value(
-        value_id=make_value_id(field, raw_value, raw_value, context),
+        value_id=make_value_id(field, typed, raw_value, context),
         status="found",
         raw_value=raw_value,
         raw_unit=raw_unit,
-        value=raw_value,
+        value=typed,
         context=context,
         evidence=[QuoteEvidence(page=1, quote=raw_value)],
         signals=Signals(

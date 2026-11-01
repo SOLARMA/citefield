@@ -3,7 +3,8 @@
     uv run python scripts/review.py template out/tm.json > tm.review.yaml
     # set each status to accepted, edited (with reviewed_value) or rejected; add missed values;
     # set a field's status to confirmed_absent when the manual doesn't state it
-    uv run python scripts/review.py apply out/tm.json tm.review.yaml -o golden/tm.json
+    uv run python scripts/review.py apply out/tm.json tm.review.yaml -o golden/tm.json \
+        -c examples/generator.yaml
 
 A stand-in for a review UI, which is out of scope for v1. Not part of the package.
 """
@@ -14,12 +15,12 @@ import argparse
 import json
 import sys
 
-from citefield.config import VerificationSettings
+import yaml
+
+from citefield.config import load_config
 from citefield.output import ExtractionResult
 from citefield.parsers import ParseError, get_parser, parse_document
 from citefield.review import apply_review, load_decisions
-
-VERIFY = VerificationSettings()  # defaults; the output doesn't record the config's settings
 
 
 def template(result: ExtractionResult) -> str:
@@ -43,6 +44,8 @@ def template(result: ExtractionResult) -> str:
                 value_lines.append(f"      # added by the reviewer: {_quote(v.raw_value)}{context}")
                 continue
             value_lines.append(f"      # {_quote(v.raw_value)}{context}, {v.raw_unit or 'no unit'}")
+            if v.status == "derived":
+                value_lines.append(f"      #   {v.derivation}")
             for e in v.evidence:
                 value_lines.append(f"      #   p.{e.page}: {_quote(e.quote)}")
             value_lines.append(
@@ -82,6 +85,7 @@ def main(argv: list[str] | None = None) -> int:
     a.add_argument("decisions")
     a.add_argument("-o", "--reviewed", required=True, help="where to write the reviewed output")
     a.add_argument("--document", help="the manual, if not at the path recorded in the output")
+    a.add_argument("-c", "--config", required=True, help="the field config, to parse added values")
     args = parser.parse_args(argv)
 
     if args.command == "template":
@@ -95,15 +99,23 @@ def main(argv: list[str] | None = None) -> int:
         if document.sha256 != result.document.sha256:
             raise ValueError(f"{document.path}: not the file this output was made from")
         pages = {u.locator.page: u.text for u in document.units if u.locator.page is not None}
+        config = load_config(args.config)
+        verify = config.settings.verification
         reviewed = apply_review(
-            result, load_decisions(args.decisions), pages=pages, page_window=VERIFY.page_window
+            result,
+            load_decisions(args.decisions),
+            pages=pages,
+            page_window=verify.page_window,
+            config=config,
         )
-    except (ValueError, ParseError) as exc:
+    except (OSError, ValueError, ParseError, yaml.YAMLError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
+    for w in reviewed.warnings[len(result.warnings) :]:  # from parsing added values
+        print(f"warning: {w.field}: added value {w.raw!r}: {w.message or w.code}", file=sys.stderr)
     for field in reviewed.fields:
         for v in field.values:
-            if v.review.status == "added" and v.signals.evidence_match < VERIFY.fuzzy_min_ratio:
+            if v.review.status == "added" and v.signals.evidence_match < verify.fuzzy_min_ratio:
                 print(
                     f"warning: {field.name}: added value {v.raw_value!r} has evidence_match "
                     f"{v.signals.evidence_match}; copy the quote from `citefield inspect`",

@@ -164,12 +164,16 @@ NUMBER_TOLERANCE = 0.01
 def same_value(a: ScalarValue, a_raw: str, b: ScalarValue, b_raw: str) -> bool:
     """Whether two values are the same: numbers within `NUMBER_TOLERANCE`, others by
     `value_key`."""
-    if _is_number(a) and _is_number(b):
-        return abs(a - b) <= NUMBER_TOLERANCE * max(abs(a), abs(b))
+    if is_number(a) and is_number(b):
+        return numbers_match(a, b)
     return value_key(a, a_raw) == value_key(b, b_raw)
 
 
-def _is_number(value: ScalarValue) -> bool:
+def numbers_match(a: float, b: float) -> bool:
+    return abs(a - b) <= NUMBER_TOLERANCE * max(abs(a), abs(b))
+
+
+def is_number(value: object) -> bool:
     return isinstance(value, int | float) and not isinstance(value, bool)
 
 

@@ -10,6 +10,7 @@ from typing import Any, Literal
 import yaml
 from pydantic import BaseModel, model_validator
 
+from citefield.config import Config
 from citefield.merge import field_status
 from citefield.output import (
     ExtractionResult,
@@ -21,7 +22,7 @@ from citefield.output import (
     Value,
     make_value_id,
 )
-from citefield.verify import evidence_match
+from citefield.verify import ParsedValue, evidence_match, parse_value
 
 
 class ValueDecision(BaseModel):
@@ -44,7 +45,7 @@ class AddedValue(BaseModel):
     """A value the reviewer found and the LLM missed. It needs evidence like any other."""
 
     raw_value: str
-    value: ScalarValue = None  # defaults to raw_value
+    value: ScalarValue = None  # defaults to raw_value, parsed when apply_review has the config
     raw_unit: str | None = None
     unit: str | None = None
     context: str | None = None
@@ -85,12 +86,16 @@ def apply_review(
     *,
     pages: Mapping[int, str] | None = None,
     page_window: int = 1,
+    config: Config | None = None,
 ) -> ExtractionResult:
     """Write review decisions into a copy of an output. Raises `ValueError` for a field or
     value_id the output doesn't have, or a field confirmed absent that keeps unrejected values.
 
     `pages` maps 1-based page numbers to the parsed text of the document, to verify the
-    evidence of added values like any other; without it their `evidence_match` is 0.
+    evidence of added values like any other; without it their `evidence_match` is 0. With
+    `config`, the raw value of an added value is parsed and converted like an extracted one,
+    and a value that can't be parsed adds its warning to the output; without it, the value
+    is the raw value as written.
     """
     if isinstance(output, ExtractionResult):
         result = output.model_copy(deep=True)
@@ -121,8 +126,19 @@ def apply_review(
                     "note": item.note,
                 }
             )
+        fdef = next((f for f in config.fields if f.name == name), None) if config else None
         for added in decision.added:
-            value = _added_value(name, added, reviewer, reviewed_at, pages or {}, page_window)
+            if added.value is None and config is not None and fdef is not None:
+                locale = config.settings.extraction.number_locale
+                parsed = parse_value(fdef, added.raw_value, added.raw_unit, locale, config.units)
+                if parsed.warning is not None and parsed.warning not in result.warnings:
+                    result.warnings.append(parsed.warning)  # once, if applied again
+            else:  # the reviewer's own value, or the raw value as written
+                value = added.raw_value if added.value is None else added.value
+                parsed = ParsedValue(value, unit=added.unit)
+            value = _added_value(
+                name, added, parsed, reviewer, reviewed_at, pages or {}, page_window
+            )
             existing = by_id.get(value.value_id)
             if existing is None:
                 field.values.append(value)
@@ -156,19 +172,20 @@ def apply_review(
 def _added_value(
     field_name: str,
     added: AddedValue,
+    parsed: ParsedValue,
     reviewer: str | None,
     reviewed_at: datetime,
     pages: Mapping[int, str],
     page_window: int,
 ) -> Value:
-    value = added.value if added.value is not None else added.raw_value
     return Value(
-        value_id=make_value_id(field_name, value, added.raw_value, added.context),
-        status="found",
+        value_id=make_value_id(field_name, parsed.value, added.raw_value, added.context),
+        status=parsed.status,
         raw_value=added.raw_value,
         raw_unit=added.raw_unit,
-        value=value,
-        unit=added.unit,
+        value=parsed.value,
+        unit=parsed.unit,
+        derivation=parsed.derivation,
         context=added.context,
         evidence=added.evidence,
         signals=Signals(
@@ -177,6 +194,7 @@ def _added_value(
                 for e in added.evidence
             ),
             citation_count=len({e.page for e in added.evidence}),
+            unit_resolved=parsed.unit_resolved,
         ),
         review=Review(
             status="added",

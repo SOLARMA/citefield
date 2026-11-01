@@ -213,6 +213,99 @@ def test_equivalent_colliding_with_another_value_is_an_error(golden, message):
         score([(output(**{F: golden}), output(**{F: []}))], config())
 
 
+W = "dry_weight"
+
+
+def number_config(examples=()):
+    field = {"name": W, "description": W, "type": "number", "unit": "kg"}
+    return Config(
+        fields=[{**field, "examples": list(examples)}],
+        settings={"llm": {"model": "fake/model"}, "extraction": {"number_locale": "en"}},
+    )
+
+
+def weight(raw, parsed, review="pending", **kw):
+    return value(W, raw, review, raw_unit="kg", parsed=parsed, **kw)
+
+
+@pytest.mark.parametrize(
+    ("predicted", "tp", "fp"),
+    [
+        ([weight("1,140", 517.1)], 1, 0),  # "1,140 lb." converted, 0.13% from 516.4
+        ([weight("520", 520)], 1, 0),  # 0.7%
+        ([weight("530", 530)], 0, 1),  # 2.6%
+        ([weight("1,140", 517.1), weight("516.4", 516.4, context="x")], 1, 0),  # one golden value
+        ([weight("700", 700), weight("701", 701, context="x")], 0, 1),  # one wrong value
+    ],
+)
+def test_numbers_match_within_one_percent(predicted, tp, fp):
+    golden = output(**{W: [weight("516.4", 516.4, "accepted")]})
+    field = score([(golden, output(**{W: predicted}))], number_config()).fields[0]
+    assert (field.true_positives, field.false_positives) == (tp, fp)
+
+
+def test_number_forms_written_by_hand_are_parsed():
+    golden = output(
+        **{
+            W: [
+                weight("600", 600, "edited", reviewed_value="516.4 kg", equivalents=["1,140 lb."]),
+                weight("50", 50, "accepted", equivalents=["110 lb"], context="empty"),
+            ]
+        }
+    )
+    predicted = output(**{W: [weight("517.1", 517.1), weight("49.9", 49.9), weight("600", 600)]})
+    report = score([(golden, predicted)], number_config())
+    field = report.fields[0]
+    assert (field.true_positives, field.false_positives, field.unjudged) == (2, 1, 0)
+
+
+@pytest.mark.parametrize(
+    ("golden", "message"),
+    [
+        ([weight("516.4", 516.4, "accepted", equivalents=["about 500"])], "doesn't parse"),
+        ([weight("516.4", 516.4, "accepted", equivalents=["516.4"])], "doesn't parse"),  # no unit
+        ([weight("1", 1, "edited", reviewed_value="25-60 kg")], "doesn't parse"),
+        (
+            [
+                weight("516.4", 516.4, "accepted"),
+                weight("600", 600, "accepted", equivalents=["517 kg"], context="x"),
+            ],
+            "matches two golden values",
+        ),
+    ],
+)
+def test_number_forms_that_fail_are_errors(golden, message):
+    with pytest.raises(EvalError, match=message):
+        score([(output(**{W: golden}), output(**{W: []}))], number_config())
+
+
+def test_text_in_a_number_field_is_an_error():
+    # what apply_review leaves without the config: the added value as written
+    golden = output(**{W: [weight("1,140", "1,140", "added")]})
+    with pytest.raises(EvalError, match="apply the review decisions again with the config"):
+        score([(golden, output(**{W: []}))], number_config())
+
+
+def test_number_examples_are_left_out_within_one_percent():
+    golden = output(**{W: [weight("500", 500, "accepted")]})
+    predicted = output(**{W: [weight("500.2", 500.2)]})
+    field = score([(golden, predicted)], number_config(examples=["1,100 lb"])).fields[0]
+    assert (field.true_positives, field.false_positives) == (0, 0)
+
+
+def unparsed(raw, review="pending"):
+    v = weight(raw, None, review)
+    v.value = None  # a range keeps value null (ADR-0020)
+    return v
+
+
+def test_unparsed_numbers_match_by_text():
+    golden = output(**{W: [unparsed("25-60", "accepted")]})
+    predicted = output(**{W: [unparsed("25 - 60")]})
+    field = score([(golden, predicted)], number_config()).fields[0]
+    assert field.true_positives == 1
+
+
 def test_carried_over_values_count_once():
     first = output("tm", **{F: [value(F, "Onan", "accepted")]})
     second = output("tm", **{F: [value(F, "Onan", "accepted")]})

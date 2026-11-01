@@ -29,7 +29,7 @@ We will round a converted value (status `derived`) to the raw value's significan
 
 Two parsed numbers of one field are the same value when they differ by at most 1% of the larger magnitude. When merging, candidates with the same normalized context and values within 1% form one value. Its raw value, unit, value and derivation come from a representative: the first candidate stated in the field's unit, or the first candidate if none is. Every candidate's evidence is kept, and `value_id` hashes the representative's value. Different values with the same or a missing context are a `conflict` only when they differ by more than 1%. Candidates whose value stays null group by raw text, as before.
 
-In the evaluation, a number or integer prediction matches a golden value when their values in the field's unit are within 1%. An edited `reviewed_value` is a number in the field's unit. An equivalent of a number field (`also_accept`, such as `516.4 kg`) is parsed and converted like a raw value and unit, and one that doesn't parse is an error. Values that stay null fall back to the text key of ADR-0017.
+In the evaluation, a number or integer prediction matches a golden value when their values in the field's unit are within 1%. An edited `reviewed_value` is a number in the field's unit, or text with its unit. That text, and an equivalent of a number field (`also_accept`, such as `516.4 kg`), is parsed and converted like a raw value and unit, and one that doesn't parse is an error. Values that stay null fall back to the text key of ADR-0017.
 
 The 1% is a constant, not a setting.
 

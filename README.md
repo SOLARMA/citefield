@@ -20,6 +20,10 @@ LLMs are good at finding values in long documents and bad at proving where those
 Define the fields you want:
 
 ```yaml
+units: # extra unit definitions for pint
+  - "bottle = [count]"
+  - "bph = bottle / hour"
+
 fields:
   - name: production_speed
     description: Nominal production speed of the machine in bottles per hour.
@@ -46,7 +50,7 @@ Get values with their evidence and confidence signals:
       "raw_unit": "bottles/min",
       "value": 24000,
       "unit": "bph",
-      "derivation": "400 bottles/min × 60 min/h = 24000 bph",
+      "derivation": "400 bottles/min = 24000 bph",
       "evidence": [
         {
           "kind": "quote",

@@ -1,8 +1,5 @@
 """Command-line interface: a thin layer over the library."""
 
-# Commands and flags that are parsed but not built yet stay out of --help until their slice
-# lands: `reextract`, `proposals`, `extract --workers` and `eval --parser`.
-
 from __future__ import annotations
 
 import argparse
@@ -22,8 +19,8 @@ def build_parser() -> argparse.ArgumentParser:
         description="Extract metadata from technical manuals, with a citation for every value.",
     )
     parser.add_argument("--version", action="version", version=f"citefield {__version__}")
-    # A subcommand added without help= is left out of the command list; the metavar keeps
-    # it out of the usage line too.
+    # Not built yet, so kept out of --help until their slice lands: `reextract` and `proposals`
+    # have no help= (so no entry in the command list) and the metavar keeps them out of the usage.
     sub = parser.add_subparsers(
         dest="command", required=True, metavar="{extract,inspect,validate-config,eval}"
     )

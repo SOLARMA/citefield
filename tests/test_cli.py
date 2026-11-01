@@ -1,3 +1,4 @@
+import pytest
 from pdfgen import write_pdf
 
 from citefield.cli import main
@@ -89,10 +90,8 @@ def test_help_hides_unbuilt_commands_and_flags(capsys):
         (["extract", "--help"], "--dry-run"),
         (["eval", "--help"], "--predictions"),
     ):
-        try:
+        with pytest.raises(SystemExit):
             main(argv)
-        except SystemExit:
-            pass
         out = capsys.readouterr().out
         assert shown in out, argv
         for hidden in ("reextract", "proposals", "--workers", "--parser", "SUPPRESS"):

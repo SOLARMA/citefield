@@ -11,6 +11,7 @@ from citefield.output import (
     ScalarValue,
     Signals,
     Value,
+    ValueStatus,
     make_value_id,
     normalize_text,
     value_key,
@@ -24,6 +25,10 @@ class Draft:
     raw_value: str
     value: ScalarValue
     raw_unit: str | None = None
+    status: ValueStatus = "found"
+    unit: str | None = None
+    derivation: str | None = None
+    unit_resolved: bool | None = None
     context: str | None = None
     evidence: list[QuoteEvidence] = field(default_factory=list)
     matches: list[float] = field(default_factory=list)  # evidence_match per evidence item
@@ -49,16 +54,19 @@ def merge(field_name: str, drafts: list[Draft]) -> list[Value]:
         values.append(
             Value(
                 value_id=value_id,
-                status="found",
+                status=first.status,
                 raw_value=first.raw_value,
                 raw_unit=first.raw_unit,
                 value=first.value,
+                unit=first.unit,
+                derivation=first.derivation,
                 context=first.context,
                 evidence=[QuoteEvidence(page=page, quote=quote) for page, quote in evidence],
                 signals=Signals(
                     evidence_match=max(evidence.values(), default=0.0),
                     citation_count=len({page for page, _ in evidence}),
                     model_confidence=max(confidences) if confidences else None,
+                    unit_resolved=first.unit_resolved,
                 ),
             )
         )

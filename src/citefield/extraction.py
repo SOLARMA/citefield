@@ -9,7 +9,7 @@ from pathlib import Path
 
 from pydantic import ValidationError
 
-from citefield.config import Config, FieldDef, Settings
+from citefield.config import Config, FieldDef
 from citefield.llm.base import Completion, LLMBackend, Message
 from citefield.merge import Draft, field_status, merge
 from citefield.output import (
@@ -114,7 +114,7 @@ class Extractor:
                     warnings.append(OutputWarning(code="unexpected_field", raw=answer.name))
                     continue
                 for candidate in answer.candidates:
-                    draft = _draft(field, candidate, pages, settings, warnings)
+                    draft = _draft(field, candidate, pages, self.config, warnings)
                     if draft is not None:
                         drafts[field.name].append(draft)
 
@@ -195,14 +195,13 @@ def _document_warnings(document: ParsedDocument, fields: list[FieldDef]) -> list
         warnings.append(OutputWarning(code="low_text_units", units=low))
     for field in fields:
         if field.type not in PARSED_TYPES:
-            message = f"{field.type} values are not parsed yet; value stays null"
-        elif field.unit is not None:
-            message = "units are not converted yet; value stays null"
-        else:
-            continue
-        warnings.append(
-            OutputWarning(code="unsupported_field_type", field=field.name, message=message)
-        )
+            warnings.append(
+                OutputWarning(
+                    code="unsupported_field_type",
+                    field=field.name,
+                    message=f"{field.type} values are not parsed yet; value stays null",
+                )
+            )
     return warnings
 
 
@@ -210,7 +209,7 @@ def _draft(
     field: FieldDef,
     candidate: extract_v1.Candidate,
     pages: dict[int, str],
-    settings: Settings,
+    config: Config,
     warnings: list[OutputWarning],
 ) -> Draft | None:
     """Turn one LLM candidate into a verified draft, or None if it has no usable evidence."""
@@ -223,13 +222,21 @@ def _draft(
     if not raw_value or not evidence:
         return None  # a candidate without evidence is not a value (ADR-0003)
 
-    value, warning = parse_value(field, raw_value, settings.extraction.number_locale)
-    if warning is not None:
-        warnings.append(warning)
+    settings = config.settings
+    raw_unit = (candidate.raw_unit or "").strip() or None
+    parsed = parse_value(
+        field, raw_value, raw_unit, settings.extraction.number_locale, config.units
+    )
+    if parsed.warning is not None:
+        warnings.append(parsed.warning)
     return Draft(
         raw_value=raw_value,
-        raw_unit=(candidate.raw_unit or "").strip() or None,
-        value=value,
+        raw_unit=raw_unit,
+        value=parsed.value,
+        status=parsed.status,
+        unit=parsed.unit,
+        derivation=parsed.derivation,
+        unit_resolved=parsed.unit_resolved,
         context=(candidate.context or "").strip() or None,
         evidence=evidence,
         matches=[

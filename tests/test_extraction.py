@@ -183,16 +183,25 @@ def test_unexpected_field_warns(manual):
 
 
 def test_unsupported_types_keep_raw_value(manual):
+    fields = [{"name": "has_wheels", "description": "Wheels.", "type": "boolean"}]
+    response = {"fields": [answer("has_wheels", candidate("yes", (2, "Manufacturer Onan")))]}
+    result = extractor(response, fields=fields).extract(manual)
+    assert result.field("has_wheels").values[0].value is None
+    assert any(w.code == "unsupported_field_type" for w in result.warnings)
+
+
+def test_numbers_are_converted_to_the_field_unit(manual):
     fields = [{"name": "dry_weight", "description": "Dry weight.", "type": "number", "unit": "kg"}]
     response = {
         "fields": [
-            answer("dry_weight", candidate("516.4", (2, "Manufacturer Onan"), raw_unit="kg"))
+            answer("dry_weight", candidate("1,140", (2, "Manufacturer Onan"), raw_unit="lb."))
         ]
     }
-    result = extractor(response, fields=fields).extract(manual)
-    value = result.field("dry_weight").values[0]
-    assert (value.raw_value, value.raw_unit, value.value) == ("516.4", "kg", None)
-    assert any(w.code == "unsupported_field_type" for w in result.warnings)
+    ex = extractor(response, fields=fields, extraction={"number_locale": "en"})
+    value = ex.extract(manual).field("dry_weight").values[0]
+    assert (value.status, value.value, value.unit) == ("derived", 517.1, "kg")
+    assert value.derivation == "1,140 lb. = 517.1 kg"
+    assert value.signals.unit_resolved is True
 
 
 @pytest.mark.parametrize(

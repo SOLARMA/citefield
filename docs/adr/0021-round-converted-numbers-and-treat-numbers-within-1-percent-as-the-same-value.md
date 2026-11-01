@@ -13,17 +13,19 @@ Rounding a converted value:
 
 - **No rounding**: float noise in the output and in `value_id`.
 - **A fixed number of significant figures**: simple, but claims precision the manual doesn't state (`9 gal.` becomes 34.07 L).
-- **The raw value's significant figures plus one**: keeps the manual's precision and one guard digit (`9 gal.` becomes 34 L, `1,140 lb.` 517.1 kg).
+- **The raw value's significant figures plus one**: keeps the manual's precision and one guard digit (`9 gal.` becomes 34 L, `1,140 lb.` 517.1 kg), but a one-digit raw value keeps only two figures, which can be off by about 5%: `5 lb (2.27 kg)` would give 2.3 kg, 1.3% from the manual's own 2.27, so the two forms would still be a conflict.
+- **The raw value's significant figures plus one, and at least four**: rounding error stays below about 0.05%, far inside the tolerance below, at the cost of showing more digits than a short raw value has (`9 gal.` becomes 34.07 L).
 
 Deciding that two numbers are the same value:
 
 - **Exact equality after rounding**: 517.1 kg and 516.4 kg are still a conflict.
 - **Bucketing**, such as rounding to two significant figures for `value_id`: ids stay stable across forms, but values either side of a bucket edge split, and different values inside one bucket merge.
 - **A relative tolerance**: absorbs the authors' own rounding, but could merge two different values that are closer than the tolerance.
+- **A tolerance that depends on precision** (1%, or half a unit of the last written digit if larger): keeps short values short, but merging and the evaluation both have to recover each value's precision from its raw text.
 
 ## Decision
 
-We will round a converted value (status `derived`) to the raw value's significant figures plus one, counting every written digit except leading zeros (`1,140` has 4, `.99` has 2, `9` has 1). A value already stated in the field's unit (status `found`) is kept as parsed. A whole number is stored as an integer, so `34.0` and `34` are the same value.
+We will round a converted value (status `derived`) to the raw value's significant figures plus one, and to at least four, counting every written digit except leading zeros (`1,140` has 4 and keeps 5, `.99` has 2 and keeps 4, `9` has 1 and keeps 4). A value already stated in the field's unit (status `found`) is kept as parsed. A whole number is stored as an integer, so `34.0` and `34` are the same value.
 
 Two parsed numbers of one field are the same value when they differ by at most 1% of the larger magnitude. When merging, candidates with the same normalized context and values within 1% form one value. Its raw value, unit, value and derivation come from a representative: the first candidate stated in the field's unit, or the first candidate if none is. Every candidate's evidence is kept, and `value_id` hashes the representative's value. Different values with the same or a missing context are a `conflict` only when they differ by more than 1%. Candidates whose value stays null group by raw text, as before.
 

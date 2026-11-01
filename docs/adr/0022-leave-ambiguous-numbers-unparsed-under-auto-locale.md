@@ -15,7 +15,7 @@
 
 ## Decision
 
-We will always warn. Under `auto`, a number whose only separator is a single `.` or `,` followed by exactly three digits is ambiguous: it keeps `value: null` and gets an `ambiguous_number` warning with the field and the raw value. Every other form is read the one way it can be read (`516.4`, `516,4`, `.99`, `1,140.5`, `1.140,5`, `1,140,000`). With `en`, `it` or `de` set, the locale decides every form.
+We will always warn. Under `auto`, a number that reads as two different values with `.` or `,` as the decimal mark, such as `24.000` or `1,140`, is ambiguous: it keeps `value: null` and gets an `ambiguous_number` warning with the field and the raw value. Every other form is read the one way it can be read (`516.4`, `516,4`, `.99`, `0,500`, `1,140.5`, `1.140,5`, `1,140,000`). With `en`, `it` or `de` set, the locale decides every form.
 
 ## Consequences
 

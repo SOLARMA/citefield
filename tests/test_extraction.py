@@ -195,6 +195,20 @@ def test_unsupported_types_keep_raw_value(manual):
     assert any(w.code == "unsupported_field_type" for w in result.warnings)
 
 
+@pytest.mark.parametrize(
+    "locale, value, warning", [("auto", None, "ambiguous_number"), ("en", 1140, None)]
+)
+def test_number_locale_reaches_parsing(manual, locale, value, warning):
+    fields = [{"name": "run_hours", "description": "Hours.", "type": "integer"}]
+    response = {"fields": [answer("run_hours", candidate("1,140", (2, "Manufacturer Onan")))]}
+    ex = extractor(response, fields=fields, extraction={"number_locale": locale})
+    result = ex.extract(manual)
+    assert result.field("run_hours").values[0].value == value
+    assert [w.code for w in result.warnings if w.field == "run_hours"] == (
+        [warning] if warning else []
+    )
+
+
 def test_plan_and_too_large(manual):
     ex = extractor(extraction={"field_batch_size": 3})
     plan = ex.plan(ex.parse(manual))

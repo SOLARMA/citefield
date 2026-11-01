@@ -1,0 +1,66 @@
+# Number fields for the generator operator's manual in corpus/ (TM 9-6115-642-10).
+# Run: citefield extract corpus/manuals/tm-9-6115-642-10.pdf -c examples/generator-numbers.yaml -o out/
+schema_version: 1
+
+fields:
+  - name: dry_weight
+    description: Dry weight of the generator set (less basic issue items), one per model.
+    type: number
+    unit: kg
+
+  - name: wet_weight
+    description: Wet weight of the generator set, one per model.
+    type: number
+    unit: kg
+
+  - name: overall_length
+    description: Overall length of the generator set, one per model.
+    type: number
+    unit: mm
+
+  - name: rated_power
+    description: Rated electrical output (load capacity) of the generator set.
+    type: number
+    unit: kW
+
+  - name: rated_current
+    description: Rated output current of the AC generator, one per voltage connection.
+    type: number
+    unit: A
+
+  - name: engine_displacement
+    description: Engine displacement.
+    type: number
+    unit: L
+
+  - name: cooling_system_capacity
+    description: Coolant capacity of the engine cooling system.
+    type: number
+    unit: L
+
+  - name: fuel_tank_capacity
+    description: Capacity of the fuel tank.
+    type: number
+    unit: L
+
+  - name: fuel_consumption_rate
+    description: Fuel consumption rate, one per output frequency.
+    type: number
+    unit: L/h
+
+  - name: normal_oil_pressure
+    description: Normal operating pressure of the engine lubricating system.
+    type: number
+    unit: kPa
+
+  - name: engine_rated_speed
+    description: Rated speed of the engine.
+    type: number
+    unit: rpm
+
+settings:
+  llm:
+    model: openrouter/anthropic/claude-haiku-5.5 # ADR-0019
+    temperature: null # not accepted by the model
+  extraction:
+    number_locale: en # the manual writes 1,140 for 1140 (ADR-0022)

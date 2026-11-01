@@ -1,0 +1,806 @@
+{
+  "citefield_version": "0.0.1",
+  "output_schema_version": 1,
+  "document": {
+    "document_id": "tm-9-6115-642-10",
+    "path": "corpus/manuals/tm-9-6115-642-10.pdf",
+    "sha256": "beedf1005f0aaabe997a10a4853dbde970181ab43e96779b6d68e0c45b33bad2",
+    "units": 137,
+    "parser": {
+      "name": "pdfplumber",
+      "version": "0.11.10"
+    }
+  },
+  "run": {
+    "run_id": "f70b5dfc7f3f407782da0b2cdd7f23e8",
+    "started_at": "2026-11-01T10:27:01.468042+01:00",
+    "model": "openrouter/anthropic/claude-haiku-5.5",
+    "prompt_version": "extract-v1",
+    "schema_hash": "f187fc58f3de089b40f1fd484b595a091bfd6e1b287aac0294ccbdbec952e69b",
+    "settings_hash": "f1bc7a2818d03606d73281b1c63ebcb7d48bcd7834bd86134d9f46dd59046ae9",
+    "n_runs": 1,
+    "chunks": 1,
+    "llm_calls": 1,
+    "tokens": {
+      "input": 65013,
+      "output": 1719
+    }
+  },
+  "fields": [
+    {
+      "name": "dry_weight",
+      "status": "found",
+      "values": [
+        {
+          "value_id": "8d7b888e3314d9e1",
+          "status": "derived",
+          "raw_value": "1,140",
+          "raw_unit": "lb.",
+          "value": 517.1,
+          "unit": "kg",
+          "derivation": "1,140 lb. = 517.1 kg",
+          "context": "MEP-803A",
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 27,
+              "quote": "Dry Weights (less Basic Issue Items):"
+            },
+            {
+              "kind": "quote",
+              "page": 27,
+              "quote": "MEP-803A 1,140 lb. (516.4 kg)"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.9,
+            "unit_resolved": true
+          },
+          "review": {
+            "status": "accepted",
+            "reviewed_value": null,
+            "equivalents": [],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:48.340089+01:00",
+            "note": null,
+            "carried_from": null,
+            "previous": null
+          }
+        },
+        {
+          "value_id": "595d7cafb2577b73",
+          "status": "derived",
+          "raw_value": "1,170",
+          "raw_unit": "lb.",
+          "value": 530.7,
+          "unit": "kg",
+          "derivation": "1,170 lb. = 530.7 kg",
+          "context": "MEP-813A",
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 27,
+              "quote": "MEP-813A 1,170 lb. (530 kg)"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.9,
+            "unit_resolved": true
+          },
+          "review": {
+            "status": "accepted",
+            "reviewed_value": null,
+            "equivalents": [],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:48.340089+01:00",
+            "note": null,
+            "carried_from": null,
+            "previous": null
+          }
+        }
+      ],
+      "error": null,
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "note": null
+      }
+    },
+    {
+      "name": "wet_weight",
+      "status": "found",
+      "values": [
+        {
+          "value_id": "7a63ac661e8d2bdb",
+          "status": "derived",
+          "raw_value": "1,242",
+          "raw_unit": "lb.",
+          "value": 563.36,
+          "unit": "kg",
+          "derivation": "1,242 lb. = 563.36 kg",
+          "context": "MEP-803A",
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 27,
+              "quote": "Wet Weights:"
+            },
+            {
+              "kind": "quote",
+              "page": 27,
+              "quote": "MEP-803A 1,242 lb. (562.6 kg)"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.9,
+            "unit_resolved": true
+          },
+          "review": {
+            "status": "accepted",
+            "reviewed_value": null,
+            "equivalents": [],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:48.340089+01:00",
+            "note": null,
+            "carried_from": null,
+            "previous": null
+          }
+        },
+        {
+          "value_id": "660807da0a836586",
+          "status": "derived",
+          "raw_value": "1,272",
+          "raw_unit": "lb.",
+          "value": 576.97,
+          "unit": "kg",
+          "derivation": "1,272 lb. = 576.97 kg",
+          "context": "MEP-813A",
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 27,
+              "quote": "MEP-813A 1,272 lb. (576.2 kg)"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.9,
+            "unit_resolved": true
+          },
+          "review": {
+            "status": "accepted",
+            "reviewed_value": null,
+            "equivalents": [],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:48.340089+01:00",
+            "note": null,
+            "carried_from": null,
+            "previous": null
+          }
+        }
+      ],
+      "error": null,
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "note": null
+      }
+    },
+    {
+      "name": "overall_length",
+      "status": "found",
+      "values": [
+        {
+          "value_id": "c4d67f3b848852e8",
+          "status": "derived",
+          "raw_value": "62",
+          "raw_unit": "in.",
+          "value": 1575,
+          "unit": "mm",
+          "derivation": "62 in. = 1575 mm",
+          "context": "MEP-803A",
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 27,
+              "quote": "Overall Length:"
+            },
+            {
+              "kind": "quote",
+              "page": 27,
+              "quote": "MEP-803A 62 in. (157.5 cm)"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.85,
+            "unit_resolved": true
+          },
+          "review": {
+            "status": "accepted",
+            "reviewed_value": null,
+            "equivalents": [],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:48.340089+01:00",
+            "note": null,
+            "carried_from": null,
+            "previous": null
+          }
+        },
+        {
+          "value_id": "231ef2f99390c22c",
+          "status": "derived",
+          "raw_value": "62",
+          "raw_unit": "in.",
+          "value": 1575,
+          "unit": "mm",
+          "derivation": "62 in. = 1575 mm",
+          "context": "MEP-813A",
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 27,
+              "quote": "MEP-813A 62 in. (157.5 cm)"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.85,
+            "unit_resolved": true
+          },
+          "review": {
+            "status": "accepted",
+            "reviewed_value": null,
+            "equivalents": [],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:48.340089+01:00",
+            "note": null,
+            "carried_from": null,
+            "previous": null
+          }
+        }
+      ],
+      "error": null,
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "note": null
+      }
+    },
+    {
+      "name": "rated_power",
+      "status": "found",
+      "values": [
+        {
+          "value_id": "9ede5fbdc02a6624",
+          "status": "found",
+          "raw_value": "10",
+          "raw_unit": "kW",
+          "value": 10,
+          "unit": "kW",
+          "derivation": null,
+          "context": "Load Capacity of both MEP-803A and MEP-813A",
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 29,
+              "quote": "Load Capacity 10 kW 10 kW"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.85,
+            "unit_resolved": true
+          },
+          "review": {
+            "status": "accepted",
+            "reviewed_value": null,
+            "equivalents": [],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:48.340089+01:00",
+            "note": null,
+            "carried_from": null,
+            "previous": null
+          }
+        }
+      ],
+      "error": null,
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "note": null
+      }
+    },
+    {
+      "name": "rated_current",
+      "status": "found",
+      "values": [
+        {
+          "value_id": "38d1c715bbb0dca8",
+          "status": "found",
+          "raw_value": "52",
+          "raw_unit": "amps",
+          "value": 52,
+          "unit": "A",
+          "derivation": null,
+          "context": "120/240 volt connection, 60 Hz (MEP-803A) and 400 Hz (MEP-813A)",
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 29,
+              "quote": "120/240 volt connection 52 amps 52 amps"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.8,
+            "unit_resolved": true
+          },
+          "review": {
+            "status": "accepted",
+            "reviewed_value": null,
+            "equivalents": [],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:48.340089+01:00",
+            "note": null,
+            "carried_from": null,
+            "previous": null
+          }
+        },
+        {
+          "value_id": "549e6018cea1818e",
+          "status": "found",
+          "raw_value": "34",
+          "raw_unit": "amps",
+          "value": 34,
+          "unit": "A",
+          "derivation": null,
+          "context": "120/208 volt connection, MEP-803A and MEP-813A",
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 29,
+              "quote": "120/208 volt connection 34 amps 34 amps"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.8,
+            "unit_resolved": true
+          },
+          "review": {
+            "status": "accepted",
+            "reviewed_value": null,
+            "equivalents": [],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:48.340089+01:00",
+            "note": null,
+            "carried_from": null,
+            "previous": null
+          }
+        },
+        {
+          "value_id": "c95b704f2768edce",
+          "status": "found",
+          "raw_value": "104",
+          "raw_unit": "amps",
+          "value": 104,
+          "unit": "A",
+          "derivation": null,
+          "context": "120 volt connection, MEP-803A and MEP-813A",
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 29,
+              "quote": "120 volt connection 104 amps 104 amps"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.8,
+            "unit_resolved": true
+          },
+          "review": {
+            "status": "accepted",
+            "reviewed_value": null,
+            "equivalents": [],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:48.340089+01:00",
+            "note": null,
+            "carried_from": null,
+            "previous": null
+          }
+        }
+      ],
+      "error": null,
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "note": null
+      }
+    },
+    {
+      "name": "engine_displacement",
+      "status": "found",
+      "values": [
+        {
+          "value_id": "b1bdcb9be3d4fbb6",
+          "status": "found",
+          "raw_value": "114 cu. in. (1.9 L)",
+          "raw_unit": "cu. in.",
+          "value": null,
+          "unit": null,
+          "derivation": null,
+          "context": "Engine, Onan DN4M",
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 28,
+              "quote": "Displacement 114 cu. in. (1.9 L)"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.7,
+            "unit_resolved": false
+          },
+          "review": {
+            "status": "edited",
+            "reviewed_value": "1.9 L",
+            "equivalents": [
+              "114 cu. in."
+            ],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:48.340089+01:00",
+            "note": "The raw value holds both forms, so it doesn't parse; 114 cu. in. is 1.868 L, inside the stated 1.9 L.",
+            "carried_from": null,
+            "previous": null
+          }
+        }
+      ],
+      "error": null,
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "note": null
+      }
+    },
+    {
+      "name": "cooling_system_capacity",
+      "status": "found",
+      "values": [
+        {
+          "value_id": "06153ea3333dca61",
+          "status": "derived",
+          "raw_value": "8.2",
+          "raw_unit": "qts.",
+          "value": 7.76,
+          "unit": "L",
+          "derivation": "8.2 qts. = 7.76 L",
+          "context": "Cooling system",
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 28,
+              "quote": "Capacity 8.2 qts. (7.8 L)"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.8,
+            "unit_resolved": true
+          },
+          "review": {
+            "status": "accepted",
+            "reviewed_value": null,
+            "equivalents": [],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:48.340089+01:00",
+            "note": null,
+            "carried_from": null,
+            "previous": null
+          }
+        }
+      ],
+      "error": null,
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "note": null
+      }
+    },
+    {
+      "name": "fuel_tank_capacity",
+      "status": "found",
+      "values": [
+        {
+          "value_id": "52d77226edc17bf7",
+          "status": "derived",
+          "raw_value": "9",
+          "raw_unit": "gal.",
+          "value": 34.07,
+          "unit": "L",
+          "derivation": "9 gal. = 34.07 L",
+          "context": "Fuel tank",
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 28,
+              "quote": "Fuel Tank Capacity 9 gal. (34 L)"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.85,
+            "unit_resolved": true
+          },
+          "review": {
+            "status": "accepted",
+            "reviewed_value": null,
+            "equivalents": [],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:48.340089+01:00",
+            "note": null,
+            "carried_from": null,
+            "previous": null
+          }
+        }
+      ],
+      "error": null,
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "note": null
+      }
+    },
+    {
+      "name": "fuel_consumption_rate",
+      "status": "found",
+      "values": [
+        {
+          "value_id": "99c9b3a572dc80cc",
+          "status": "found",
+          "raw_value": ".99",
+          "raw_unit": "gal.",
+          "value": null,
+          "unit": null,
+          "derivation": null,
+          "context": "60 Hz output",
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 28,
+              "quote": "Fuel Consumption Rate 60 Hz: .99 gal. (3.75 L) per hour"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.8,
+            "unit_resolved": false
+          },
+          "review": {
+            "status": "edited",
+            "reviewed_value": "3.75 L/h",
+            "equivalents": [
+              ".99 gal. per hour"
+            ],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:48.340089+01:00",
+            "note": "A rate per hour; the raw unit dropped \"per hour\", so it doesn't convert.",
+            "carried_from": null,
+            "previous": null
+          }
+        },
+        {
+          "value_id": "47403e8b006dd33c",
+          "status": "found",
+          "raw_value": "1.07",
+          "raw_unit": "gal.",
+          "value": null,
+          "unit": null,
+          "derivation": null,
+          "context": "400 Hz output",
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 28,
+              "quote": "400 Hz: 1.07 gal. (4.05 L) per hour"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.8,
+            "unit_resolved": false
+          },
+          "review": {
+            "status": "edited",
+            "reviewed_value": "4.05 L/h",
+            "equivalents": [
+              "1.07 gal. per hour"
+            ],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:48.340089+01:00",
+            "note": "A rate per hour; the raw unit dropped \"per hour\", so it doesn't convert.",
+            "carried_from": null,
+            "previous": null
+          }
+        }
+      ],
+      "error": null,
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "note": null
+      }
+    },
+    {
+      "name": "normal_oil_pressure",
+      "status": "found",
+      "values": [
+        {
+          "value_id": "820ec1c74e275740",
+          "status": "found",
+          "raw_value": "25-60",
+          "raw_unit": "psi",
+          "value": null,
+          "unit": null,
+          "derivation": null,
+          "context": "Normal operating pressure of lubricating system",
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 28,
+              "quote": "Normal Operating Pressure 25-60 psi (172-414 kPa)"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.8,
+            "unit_resolved": false
+          },
+          "review": {
+            "status": "accepted",
+            "reviewed_value": null,
+            "equivalents": [
+              "172-414"
+            ],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:48.340089+01:00",
+            "note": "A range: value stays null (ADR-0020); 172-414 is the same range in kPa.",
+            "carried_from": null,
+            "previous": null
+          }
+        }
+      ],
+      "error": null,
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "note": null
+      }
+    },
+    {
+      "name": "engine_rated_speed",
+      "status": "not_found",
+      "values": [],
+      "error": null,
+      "review": {
+        "status": "confirmed_absent",
+        "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+        "reviewed_at": "2026-11-01T17:30:48.340089+01:00",
+        "note": null
+      }
+    }
+  ],
+  "proposals": [],
+  "warnings": [
+    {
+      "code": "low_text_units",
+      "message": null,
+      "field": null,
+      "units": [
+        2,
+        6,
+        8,
+        16,
+        30,
+        39,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        67,
+        82,
+        83,
+        88,
+        98,
+        100,
+        108,
+        112,
+        113,
+        116,
+        120,
+        122,
+        134,
+        135,
+        136
+      ],
+      "raw": null
+    },
+    {
+      "code": "not_a_number",
+      "message": "'114 cu. in. (1.9 L)' is not a number",
+      "field": "engine_displacement",
+      "units": null,
+      "raw": "114 cu. in. (1.9 L)"
+    },
+    {
+      "code": "unit_unresolved",
+      "message": "'gal.' doesn't convert to L/h",
+      "field": "fuel_consumption_rate",
+      "units": null,
+      "raw": ".99"
+    },
+    {
+      "code": "unit_unresolved",
+      "message": "'gal.' doesn't convert to L/h",
+      "field": "fuel_consumption_rate",
+      "units": null,
+      "raw": "1.07"
+    },
+    {
+      "code": "number_not_scalar",
+      "message": "'25-60' is a range or tolerance",
+      "field": "normal_oil_pressure",
+      "units": null,
+      "raw": "25-60"
+    }
+  ]
+}

@@ -4,7 +4,7 @@
 
 citefield is a Python library and CLI that reads a technical manual (PDF or Markdown), extracts the fields you define in a YAML config, and returns JSON in which every value cites a verbatim quote or table cell and its page. A human can then review the result value by value.
 
-> **Status:** early development. `citefield extract` runs end to end on PDFs for string and enum fields, with verified quotes, and `citefield eval` scores it against hand-reviewed outputs; numbers and units, tables, proposals and review carry-over come next. The plan is in [`docs/design.md`](docs/design.md), and [`examples/`](examples/) has configs for the manuals in [`corpus/`](corpus/README.md).
+> **Status:** early development. `citefield extract` runs end to end on PDFs for string, enum and number fields, with verified quotes and units converted in code, and `citefield eval` scores it against hand-reviewed outputs; tables, proposals and review carry-over come next. The plan is in [`docs/design.md`](docs/design.md), and [`examples/`](examples/) has configs for the manuals in [`corpus/`](corpus/README.md).
 
 ## Why
 

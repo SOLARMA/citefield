@@ -1,0 +1,161 @@
+# Review of tm-9-6115-642-10 (corpus/manuals/tm-9-6115-642-10.pdf)
+# run f70b5dfc7f3f407782da0b2cdd7f23e8, model openrouter/anthropic/claude-haiku-5.5
+reviewer: "claude-opus-5-5, validated by Alessio Chessa"
+fields:
+  dry_weight:
+    # field status: found
+    status: pending  # or confirmed_absent
+    values:
+      # "1,140" (MEP-803A), lb.
+      #   1,140 lb. = 517.1 kg
+      #   p.27: "Dry Weights (less Basic Issue Items):"
+      #   p.27: "MEP-803A 1,140 lb. (516.4 kg)"
+      #   evidence_match 1.0, model_confidence 0.9
+      - value_id: 8d7b888e3314d9e1
+        status: accepted
+      # "1,170" (MEP-813A), lb.
+      #   1,170 lb. = 530.7 kg
+      #   p.27: "MEP-813A 1,170 lb. (530 kg)"
+      #   evidence_match 1.0, model_confidence 0.9
+      - value_id: 595d7cafb2577b73
+        status: accepted
+    added: []  # - {raw_value: ..., context: ..., evidence: [{page: 1, quote: ...}]}
+  wet_weight:
+    # field status: found
+    status: pending  # or confirmed_absent
+    values:
+      # "1,242" (MEP-803A), lb.
+      #   1,242 lb. = 563.36 kg
+      #   p.27: "Wet Weights:"
+      #   p.27: "MEP-803A 1,242 lb. (562.6 kg)"
+      #   evidence_match 1.0, model_confidence 0.9
+      - value_id: 7a63ac661e8d2bdb
+        status: accepted
+      # "1,272" (MEP-813A), lb.
+      #   1,272 lb. = 576.97 kg
+      #   p.27: "MEP-813A 1,272 lb. (576.2 kg)"
+      #   evidence_match 1.0, model_confidence 0.9
+      - value_id: 660807da0a836586
+        status: accepted
+    added: []  # - {raw_value: ..., context: ..., evidence: [{page: 1, quote: ...}]}
+  overall_length:
+    # field status: found
+    status: pending  # or confirmed_absent
+    values:
+      # "62" (MEP-803A), in.
+      #   62 in. = 1575 mm
+      #   p.27: "Overall Length:"
+      #   p.27: "MEP-803A 62 in. (157.5 cm)"
+      #   evidence_match 1.0, model_confidence 0.85
+      - value_id: c4d67f3b848852e8
+        status: accepted
+      # "62" (MEP-813A), in.
+      #   62 in. = 1575 mm
+      #   p.27: "MEP-813A 62 in. (157.5 cm)"
+      #   evidence_match 1.0, model_confidence 0.85
+      - value_id: 231ef2f99390c22c
+        status: accepted
+    added: []  # - {raw_value: ..., context: ..., evidence: [{page: 1, quote: ...}]}
+  rated_power:
+    # field status: found
+    status: pending  # or confirmed_absent
+    values:
+      # "10" (Load Capacity of both MEP-803A and MEP-813A), kW
+      #   p.29: "Load Capacity 10 kW 10 kW"
+      #   evidence_match 1.0, model_confidence 0.85
+      - value_id: 9ede5fbdc02a6624
+        status: accepted
+    added: []  # - {raw_value: ..., context: ..., evidence: [{page: 1, quote: ...}]}
+  rated_current:
+    # field status: found
+    status: pending  # or confirmed_absent
+    values:
+      # "52" (120/240 volt connection, 60 Hz (MEP-803A) and 400 Hz (MEP-813A)), amps
+      #   p.29: "120/240 volt connection 52 amps 52 amps"
+      #   evidence_match 1.0, model_confidence 0.8
+      - value_id: 38d1c715bbb0dca8
+        status: accepted
+      # "34" (120/208 volt connection, MEP-803A and MEP-813A), amps
+      #   p.29: "120/208 volt connection 34 amps 34 amps"
+      #   evidence_match 1.0, model_confidence 0.8
+      - value_id: 549e6018cea1818e
+        status: accepted
+      # "104" (120 volt connection, MEP-803A and MEP-813A), amps
+      #   p.29: "120 volt connection 104 amps 104 amps"
+      #   evidence_match 1.0, model_confidence 0.8
+      - value_id: c95b704f2768edce
+        status: accepted
+    added: []  # - {raw_value: ..., context: ..., evidence: [{page: 1, quote: ...}]}
+  engine_displacement:
+    # field status: found
+    status: pending  # or confirmed_absent
+    values:
+      # "114 cu. in. (1.9 L)" (Engine, Onan DN4M), cu. in.
+      #   p.28: "Displacement 114 cu. in. (1.9 L)"
+      #   evidence_match 1.0, model_confidence 0.7
+      - value_id: b1bdcb9be3d4fbb6
+        status: edited
+        reviewed_value: "1.9 L"
+        also_accept: ["114 cu. in."]
+        note: "The raw value holds both forms, so it doesn't parse; 114 cu. in. is 1.868 L, inside the stated 1.9 L."
+    added: []  # - {raw_value: ..., context: ..., evidence: [{page: 1, quote: ...}]}
+  cooling_system_capacity:
+    # field status: found
+    status: pending  # or confirmed_absent
+    values:
+      # "8.2" (Cooling system), qts.
+      #   8.2 qts. = 7.76 L
+      #   p.28: "Capacity 8.2 qts. (7.8 L)"
+      #   evidence_match 1.0, model_confidence 0.8
+      - value_id: 06153ea3333dca61
+        status: accepted
+    added: []  # - {raw_value: ..., context: ..., evidence: [{page: 1, quote: ...}]}
+  fuel_tank_capacity:
+    # field status: found
+    status: pending  # or confirmed_absent
+    values:
+      # "9" (Fuel tank), gal.
+      #   9 gal. = 34.07 L
+      #   p.28: "Fuel Tank Capacity 9 gal. (34 L)"
+      #   evidence_match 1.0, model_confidence 0.85
+      - value_id: 52d77226edc17bf7
+        status: accepted
+    added: []  # - {raw_value: ..., context: ..., evidence: [{page: 1, quote: ...}]}
+  fuel_consumption_rate:
+    # field status: found
+    status: pending  # or confirmed_absent
+    values:
+      # ".99" (60 Hz output), gal.
+      #   p.28: "Fuel Consumption Rate 60 Hz: .99 gal. (3.75 L) per hour"
+      #   evidence_match 1.0, model_confidence 0.8
+      - value_id: 99c9b3a572dc80cc
+        status: edited
+        reviewed_value: "3.75 L/h"
+        also_accept: [".99 gal. per hour"]
+        note: "A rate per hour; the raw unit dropped \"per hour\", so it doesn't convert."
+      # "1.07" (400 Hz output), gal.
+      #   p.28: "400 Hz: 1.07 gal. (4.05 L) per hour"
+      #   evidence_match 1.0, model_confidence 0.8
+      - value_id: 47403e8b006dd33c
+        status: edited
+        reviewed_value: "4.05 L/h"
+        also_accept: ["1.07 gal. per hour"]
+        note: "A rate per hour; the raw unit dropped \"per hour\", so it doesn't convert."
+    added: []  # - {raw_value: ..., context: ..., evidence: [{page: 1, quote: ...}]}
+  normal_oil_pressure:
+    # field status: found
+    status: pending  # or confirmed_absent
+    values:
+      # "25-60" (Normal operating pressure of lubricating system), psi
+      #   p.28: "Normal Operating Pressure 25-60 psi (172-414 kPa)"
+      #   evidence_match 1.0, model_confidence 0.8
+      - value_id: 820ec1c74e275740
+        status: accepted
+        also_accept: ["172-414"]
+        note: "A range: value stays null (ADR-0020); 172-414 is the same range in kPa."
+    added: []  # - {raw_value: ..., context: ..., evidence: [{page: 1, quote: ...}]}
+  engine_rated_speed:
+    # field status: not_found
+    status: confirmed_absent  # or confirmed_absent
+    values: []
+    added: []  # - {raw_value: ..., context: ..., evidence: [{page: 1, quote: ...}]}

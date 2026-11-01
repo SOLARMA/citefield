@@ -1,0 +1,550 @@
+{
+  "citefield_version": "0.0.1",
+  "output_schema_version": 1,
+  "document": {
+    "document_id": "lulzbot-taz-sidekick-user-guide-v1.2",
+    "path": "corpus/manuals/lulzbot-taz-sidekick-user-guide-v1.2.pdf",
+    "sha256": "9ef45d18ff84f91cee609b584bac2a16299b00cb321474e771c2f520ffaf55b6",
+    "units": 100,
+    "parser": {
+      "name": "pdfplumber",
+      "version": "0.11.10"
+    }
+  },
+  "run": {
+    "run_id": "e12155c1f3c84cecaf16c4b74c7896c0",
+    "started_at": "2026-11-01T10:27:16.755696+01:00",
+    "model": "openrouter/anthropic/claude-haiku-5.5",
+    "prompt_version": "extract-v1",
+    "schema_hash": "90b2e1ed8f24cb7a6fd79e9c4e1c1a85041a98cd71e3c39c1572cb627b428802",
+    "settings_hash": "f1bc7a2818d03606d73281b1c63ebcb7d48bcd7834bd86134d9f46dd59046ae9",
+    "n_runs": 1,
+    "chunks": 1,
+    "llm_calls": 1,
+    "tokens": {
+      "input": 44497,
+      "output": 2826
+    }
+  },
+  "fields": [
+    {
+      "name": "net_weight",
+      "status": "found",
+      "values": [
+        {
+          "value_id": "cefe183f7fe96908",
+          "status": "derived",
+          "raw_value": "18.92",
+          "raw_unit": "lb",
+          "value": 8.582,
+          "unit": "kg",
+          "derivation": "18.92 lb = 8.582 kg",
+          "context": "289 model",
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 79,
+              "quote": "18.92lb 20.35lb"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.7,
+            "unit_resolved": true
+          },
+          "review": {
+            "status": "accepted",
+            "reviewed_value": null,
+            "equivalents": [],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:51.254037+01:00",
+            "note": null,
+            "carried_from": null,
+            "previous": null
+          }
+        },
+        {
+          "value_id": "37d77ccec5eeb009",
+          "status": "derived",
+          "raw_value": "20.35",
+          "raw_unit": "lb",
+          "value": 9.2306,
+          "unit": "kg",
+          "derivation": "20.35 lb = 9.2306 kg",
+          "context": "747 model",
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 79,
+              "quote": "18.92lb 20.35lb"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.7,
+            "unit_resolved": true
+          },
+          "review": {
+            "status": "accepted",
+            "reviewed_value": null,
+            "equivalents": [],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:51.254037+01:00",
+            "note": null,
+            "carried_from": null,
+            "previous": null
+          }
+        }
+      ],
+      "error": null,
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "note": null
+      }
+    },
+    {
+      "name": "max_print_surface_temperature",
+      "status": "found",
+      "values": [
+        {
+          "value_id": "11a2ff3e37c2b095",
+          "status": "found",
+          "raw_value": "110",
+          "raw_unit": "° C",
+          "value": 110,
+          "unit": "degC",
+          "derivation": null,
+          "context": null,
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 79,
+              "quote": "Maximum print surface temperature: Up to 110° C (230° F)"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.85,
+            "unit_resolved": true
+          },
+          "review": {
+            "status": "accepted",
+            "reviewed_value": null,
+            "equivalents": [],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:51.254037+01:00",
+            "note": null,
+            "carried_from": null,
+            "previous": null
+          }
+        }
+      ],
+      "error": null,
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "note": null
+      }
+    },
+    {
+      "name": "power_supply_power",
+      "status": "found",
+      "values": [
+        {
+          "value_id": "fd085c58e7c2f0d7",
+          "status": "found",
+          "raw_value": "150",
+          "raw_unit": "W",
+          "value": 150,
+          "unit": "W",
+          "derivation": null,
+          "context": "289 model",
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 79,
+              "quote": "150W, 21A"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.8,
+            "unit_resolved": true
+          },
+          "review": {
+            "status": "accepted",
+            "reviewed_value": null,
+            "equivalents": [],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:51.254037+01:00",
+            "note": null,
+            "carried_from": null,
+            "previous": null
+          }
+        },
+        {
+          "value_id": "380100ee6e82d544",
+          "status": "found",
+          "raw_value": "350",
+          "raw_unit": "W",
+          "value": 350,
+          "unit": "W",
+          "derivation": null,
+          "context": "747 model",
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 79,
+              "quote": "350W, 14.6A"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.8,
+            "unit_resolved": true
+          },
+          "review": {
+            "status": "accepted",
+            "reviewed_value": null,
+            "equivalents": [],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:51.254037+01:00",
+            "note": null,
+            "carried_from": null,
+            "previous": null
+          }
+        }
+      ],
+      "error": null,
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "note": null
+      }
+    },
+    {
+      "name": "power_supply_output_voltage",
+      "status": "found",
+      "values": [
+        {
+          "value_id": "021205b8f866a3c2",
+          "status": "found",
+          "raw_value": "24",
+          "raw_unit": "VDC",
+          "value": 24,
+          "unit": "V",
+          "derivation": null,
+          "context": null,
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 79,
+              "quote": "24VDC"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.8,
+            "unit_resolved": true
+          },
+          "review": {
+            "status": "accepted",
+            "reviewed_value": null,
+            "equivalents": [],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:51.254037+01:00",
+            "note": null,
+            "carried_from": null,
+            "previous": null
+          }
+        }
+      ],
+      "error": null,
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "note": null
+      }
+    },
+    {
+      "name": "power_supply_output_current",
+      "status": "found",
+      "values": [
+        {
+          "value_id": "a5fa0b96321d00de",
+          "status": "found",
+          "raw_value": "21",
+          "raw_unit": "A",
+          "value": 21,
+          "unit": "A",
+          "derivation": null,
+          "context": "289 model",
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 79,
+              "quote": "150W, 21A"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.8,
+            "unit_resolved": true
+          },
+          "review": {
+            "status": "accepted",
+            "reviewed_value": null,
+            "equivalents": [],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:51.254037+01:00",
+            "note": null,
+            "carried_from": null,
+            "previous": null
+          }
+        },
+        {
+          "value_id": "171e9b8c2e04e5bb",
+          "status": "found",
+          "raw_value": "14.6",
+          "raw_unit": "A",
+          "value": 14.6,
+          "unit": "A",
+          "derivation": null,
+          "context": "747 model",
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 79,
+              "quote": "350W, 14.6A"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.8,
+            "unit_resolved": true
+          },
+          "review": {
+            "status": "accepted",
+            "reviewed_value": null,
+            "equivalents": [],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:51.254037+01:00",
+            "note": null,
+            "carried_from": null,
+            "previous": null
+          }
+        }
+      ],
+      "error": null,
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "note": null
+      }
+    },
+    {
+      "name": "input_voltage",
+      "status": "found",
+      "values": [
+        {
+          "value_id": "f056070d998481cd",
+          "status": "found",
+          "raw_value": "100",
+          "raw_unit": "VAC",
+          "value": 100,
+          "unit": "V",
+          "derivation": null,
+          "context": "Single Phase input range, lower limit",
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 79,
+              "quote": "Single Phase, 100VAC - 240VAC, 50/60Hz"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.5,
+            "unit_resolved": true
+          },
+          "review": {
+            "status": "rejected",
+            "reviewed_value": null,
+            "equivalents": [],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:51.254037+01:00",
+            "note": "One end of the range 100VAC - 240VAC, which is one fact (ADR-0020); added below as stated.",
+            "carried_from": null,
+            "previous": null
+          }
+        },
+        {
+          "value_id": "f724240d61f402a4",
+          "status": "found",
+          "raw_value": "240",
+          "raw_unit": "VAC",
+          "value": 240,
+          "unit": "V",
+          "derivation": null,
+          "context": "Single Phase input range, upper limit",
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 79,
+              "quote": "Single Phase, 100VAC - 240VAC, 50/60Hz"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": 0.5,
+            "unit_resolved": true
+          },
+          "review": {
+            "status": "rejected",
+            "reviewed_value": null,
+            "equivalents": [],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:51.254037+01:00",
+            "note": "One end of the range 100VAC - 240VAC, which is one fact (ADR-0020); added below as stated.",
+            "carried_from": null,
+            "previous": null
+          }
+        },
+        {
+          "value_id": "0384abadcbab0441",
+          "status": "found",
+          "raw_value": "100VAC - 240VAC",
+          "raw_unit": null,
+          "value": null,
+          "unit": null,
+          "derivation": null,
+          "context": "Single Phase, 50/60Hz",
+          "evidence": [
+            {
+              "kind": "quote",
+              "page": 79,
+              "quote": "Single Phase, 100VAC - 240VAC, 50/60Hz,"
+            }
+          ],
+          "signals": {
+            "evidence_match": 1.0,
+            "citation_count": 1,
+            "run_agreement": null,
+            "model_confidence": null,
+            "unit_resolved": false
+          },
+          "review": {
+            "status": "added",
+            "reviewed_value": null,
+            "equivalents": [],
+            "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+            "reviewed_at": "2026-11-01T17:30:51.254037+01:00",
+            "note": null,
+            "carried_from": null,
+            "previous": null
+          }
+        }
+      ],
+      "error": null,
+      "review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "note": null
+      }
+    },
+    {
+      "name": "max_print_speed",
+      "status": "not_found",
+      "values": [],
+      "error": null,
+      "review": {
+        "status": "confirmed_absent",
+        "reviewer": "claude-opus-5-5, validated by Alessio Chessa",
+        "reviewed_at": "2026-11-01T17:30:51.254037+01:00",
+        "note": null
+      }
+    }
+  ],
+  "proposals": [],
+  "warnings": [
+    {
+      "code": "low_text_units",
+      "message": null,
+      "field": null,
+      "units": [
+        1,
+        2,
+        3,
+        6,
+        7,
+        10,
+        11,
+        14,
+        15,
+        20,
+        21,
+        26,
+        27,
+        30,
+        31,
+        32,
+        34,
+        35,
+        46,
+        47,
+        50,
+        51,
+        58,
+        59,
+        64,
+        65,
+        76,
+        77,
+        80,
+        81,
+        86,
+        87,
+        94,
+        95,
+        98,
+        99,
+        100
+      ],
+      "raw": null
+    },
+    {
+      "code": "number_not_scalar",
+      "message": "'100VAC - 240VAC' is a range or tolerance",
+      "field": "input_voltage",
+      "units": null,
+      "raw": "100VAC - 240VAC"
+    }
+  ]
+}

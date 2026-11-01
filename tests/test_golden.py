@@ -20,4 +20,4 @@ def test_golden_output_matches_its_config(path):
 
     decisions = path.with_suffix(".review.yaml")
     if decisions.exists():
-        apply_review(result, load_decisions(decisions))
+        apply_review(result, load_decisions(decisions), config=config)

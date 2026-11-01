@@ -1,0 +1,94 @@
+# Review of lulzbot-taz-sidekick-user-guide-v1.2 (corpus/manuals/lulzbot-taz-sidekick-user-guide-v1.2.pdf)
+# run e12155c1f3c84cecaf16c4b74c7896c0, model openrouter/anthropic/claude-haiku-5.5
+reviewer: "claude-opus-5-5, validated by Alessio Chessa"
+fields:
+  net_weight:
+    # field status: found
+    status: pending  # or confirmed_absent
+    values:
+      # "18.92" (289 model), lb
+      #   18.92 lb = 8.582 kg
+      #   p.79: "18.92lb 20.35lb"
+      #   evidence_match 1.0, model_confidence 0.7
+      - value_id: cefe183f7fe96908
+        status: accepted
+      # "20.35" (747 model), lb
+      #   20.35 lb = 9.2306 kg
+      #   p.79: "18.92lb 20.35lb"
+      #   evidence_match 1.0, model_confidence 0.7
+      - value_id: 37d77ccec5eeb009
+        status: accepted
+    added: []  # - {raw_value: ..., context: ..., evidence: [{page: 1, quote: ...}]}
+  max_print_surface_temperature:
+    # field status: found
+    status: pending  # or confirmed_absent
+    values:
+      # "110", ° C
+      #   p.79: "Maximum print surface temperature: Up to 110° C (230° F)"
+      #   evidence_match 1.0, model_confidence 0.85
+      - value_id: 11a2ff3e37c2b095
+        status: accepted
+    added: []  # - {raw_value: ..., context: ..., evidence: [{page: 1, quote: ...}]}
+  power_supply_power:
+    # field status: found
+    status: pending  # or confirmed_absent
+    values:
+      # "150" (289 model), W
+      #   p.79: "150W, 21A"
+      #   evidence_match 1.0, model_confidence 0.8
+      - value_id: fd085c58e7c2f0d7
+        status: accepted
+      # "350" (747 model), W
+      #   p.79: "350W, 14.6A"
+      #   evidence_match 1.0, model_confidence 0.8
+      - value_id: 380100ee6e82d544
+        status: accepted
+    added: []  # - {raw_value: ..., context: ..., evidence: [{page: 1, quote: ...}]}
+  power_supply_output_voltage:
+    # field status: found
+    status: pending  # or confirmed_absent
+    values:
+      # "24", VDC
+      #   p.79: "24VDC"
+      #   evidence_match 1.0, model_confidence 0.8
+      - value_id: 021205b8f866a3c2
+        status: accepted
+    added: []  # - {raw_value: ..., context: ..., evidence: [{page: 1, quote: ...}]}
+  power_supply_output_current:
+    # field status: found
+    status: pending  # or confirmed_absent
+    values:
+      # "21" (289 model), A
+      #   p.79: "150W, 21A"
+      #   evidence_match 1.0, model_confidence 0.8
+      - value_id: a5fa0b96321d00de
+        status: accepted
+      # "14.6" (747 model), A
+      #   p.79: "350W, 14.6A"
+      #   evidence_match 1.0, model_confidence 0.8
+      - value_id: 171e9b8c2e04e5bb
+        status: accepted
+    added: []  # - {raw_value: ..., context: ..., evidence: [{page: 1, quote: ...}]}
+  input_voltage:
+    # field status: found
+    status: pending  # or confirmed_absent
+    values:
+      # "100" (Single Phase input range, lower limit), VAC
+      #   p.79: "Single Phase, 100VAC - 240VAC, 50/60Hz"
+      #   evidence_match 1.0, model_confidence 0.5
+      - value_id: f056070d998481cd
+        status: rejected
+        note: "One end of the range 100VAC - 240VAC, which is one fact (ADR-0020); added below as stated."
+      # "240" (Single Phase input range, upper limit), VAC
+      #   p.79: "Single Phase, 100VAC - 240VAC, 50/60Hz"
+      #   evidence_match 1.0, model_confidence 0.5
+      - value_id: f724240d61f402a4
+        status: rejected
+        note: "One end of the range 100VAC - 240VAC, which is one fact (ADR-0020); added below as stated."
+    added:
+      - {raw_value: "100VAC - 240VAC", context: "Single Phase, 50/60Hz", evidence: [{page: 79, quote: "Single Phase, 100VAC - 240VAC, 50/60Hz,"}]}
+  max_print_speed:
+    # field status: not_found
+    status: confirmed_absent  # or confirmed_absent
+    values: []
+    added: []  # - {raw_value: ..., context: ..., evidence: [{page: 1, quote: ...}]}

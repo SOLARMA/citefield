@@ -38,16 +38,15 @@ class Draft:
 def merge(field_name: str, drafts: list[Draft]) -> list[Value]:
     """Group drafts by value and normalized context; keep all their evidence.
 
-    Numbers within 1% are the same value (ADR-0021). Each group's value comes from its
+    Numbers within 1%, or a converted number within a stated one's written precision, are
+    the same value (ADR-0021). Each group's value comes from its
     representative: the first draft stated in the field's unit, or the first draft.
     """
     groups: list[list[Draft]] = []
     for draft in drafts:
         for group in groups:
             first = group[0]  # compare with the first, so groups don't drift by chaining
-            if _context_key(first) == _context_key(draft) and same_value(
-                first.value, first.raw_value, draft.value, draft.raw_value
-            ):
+            if _context_key(first) == _context_key(draft) and same_value(first, draft):
                 group.append(draft)
                 break
         else:
@@ -87,11 +86,11 @@ def merge(field_name: str, drafts: list[Draft]) -> list[Value]:
 
 def field_status(values: list[Value]) -> FieldStatus:
     """`not_found` with no values; `conflict` when two different values share a context, or
-    either has none; `found` otherwise. Numbers within 1% aren't different (ADR-0021)."""
+    either has none; `found` otherwise. Numbers are compared as in `merge` (ADR-0021)."""
     if not values:
         return "not_found"
     for a, b in combinations(values, 2):
-        if same_value(a.value, a.raw_value, b.value, b.raw_value):
+        if same_value(a, b):
             continue
         if (
             a.context is None

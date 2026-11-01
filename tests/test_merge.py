@@ -124,3 +124,21 @@ def test_close_numbers_in_other_contexts_are_no_conflict():
     values = merge("m", [draft(516.4, 1, context="MEP-803A"), draft(517.1, 2)])
     assert len(values) == 2  # contexts differ
     assert field_status(values) == "found"  # but they're the same value
+
+
+def test_a_conversion_within_a_stated_values_precision_merges():
+    # "Displacement 114 cu. in. (1.9 L)": 114 in³ is 1.868 L, 1.7% from 1.9 but inside 1.85-1.95
+    converted = draft(1.868, 28, context="engine", raw="114", status="derived", unit="L")
+    stated = draft(1.9, 28, context="engine", raw="1.9", status="found", unit="L")
+    values = merge("engine_displacement", [converted, stated])
+    assert [(v.value, v.status) for v in values] == [(1.9, "found")]
+    assert field_status(values) == "found"
+
+
+def test_two_stated_values_dont_use_their_precision():
+    # "1" covers 0.5-1.5, but two stated values that differ are a conflict
+    values = merge("m", [draft(1, 1, context="x", raw="1"), draft(1.4, 2, context="x", raw="1.4")])
+    assert field_status(values) == "conflict"
+    far = draft(1.96, 2, context="x", raw="114", status="derived", unit="L")
+    values = merge("m", [draft(1.9, 1, context="x", raw="1.9"), far])  # outside 1.85-1.95
+    assert field_status(values) == "conflict"

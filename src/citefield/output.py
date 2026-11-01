@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import math
+import re
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, Protocol
 
 from pydantic import BaseModel
 
@@ -161,16 +164,63 @@ def value_key(value: ScalarValue, raw_value: str) -> ScalarValue:
 NUMBER_TOLERANCE = 0.01
 
 
-def same_value(a: ScalarValue, a_raw: str, b: ScalarValue, b_raw: str) -> bool:
-    """Whether two values are the same: numbers within `NUMBER_TOLERANCE`, others by
-    `value_key`."""
-    if is_number(a) and is_number(b):
-        return numbers_match(a, b)
-    return value_key(a, a_raw) == value_key(b, b_raw)
+class _Parsed(Protocol):
+    value: ScalarValue
+    raw_value: str
+    status: ValueStatus
 
 
-def numbers_match(a: float, b: float) -> bool:
-    return abs(a - b) <= NUMBER_TOLERANCE * max(abs(a), abs(b))
+@dataclass(frozen=True)
+class NumberKey:
+    """A number as compared: its value, and whether it was converted or stated.
+
+    `width` is a stated value's written precision, half a unit of its last digit ("1.9" is
+    ±0.05); 0 for a converted value, or a number given without its text.
+    """
+
+    value: int | float
+    width: float = 0.0
+    derived: bool = False
+
+
+def number_key(v: _Parsed) -> NumberKey | None:
+    """The `NumberKey` of a parsed value, or None when its value isn't a number."""
+    if not is_number(v.value):
+        return None
+    if v.status == "derived":
+        return NumberKey(v.value, derived=True)
+    return NumberKey(v.value, written_precision(v.raw_value, v.value))
+
+
+def written_precision(raw: str, value: float) -> float:
+    """Half a unit of the last digit written in `raw`, which states `value`: "1.9" is
+    ±0.05, and "1,140" is ±0.5 when read as 1140. 0 when the digits don't give `value`."""
+    digits = re.sub(r"\D", "", raw).lstrip("0")
+    if not digits or not value:
+        return 0.0
+    exponent = math.log10(abs(value) / int(digits))
+    if abs(exponent - round(exponent)) > 1e-9:
+        return 0.0  # other digits in the text, such as a unit "m3"
+    return 0.5 * 10 ** round(exponent)
+
+
+def numbers_match(a: NumberKey, b: NumberKey) -> bool:
+    """Within `NUMBER_TOLERANCE`, or a converted number within the written precision of a
+    stated one (ADR-0021): 114 cu. in. is 1.868 L, inside "1.9 L"."""
+    diff = abs(a.value - b.value)
+    if diff <= NUMBER_TOLERANCE * max(abs(a.value), abs(b.value)):
+        return True
+    if a.derived != b.derived:
+        return diff <= (b if a.derived else a).width
+    return False
+
+
+def same_value(a: _Parsed, b: _Parsed) -> bool:
+    """Whether two values are the same: numbers by `numbers_match`, others by `value_key`."""
+    ka, kb = number_key(a), number_key(b)
+    if ka is not None and kb is not None:
+        return numbers_match(ka, kb)
+    return value_key(a.value, a.raw_value) == value_key(b.value, b.raw_value)
 
 
 def is_number(value: object) -> bool:

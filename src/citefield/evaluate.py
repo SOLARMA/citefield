@@ -15,12 +15,14 @@ from citefield.config import Config, FieldDef
 from citefield.output import (
     ExtractionResult,
     FieldResult,
+    NumberKey,
     ScalarValue,
     TokenUsage,
     Value,
-    is_number,
     normalize_text,
+    number_key,
     numbers_match,
+    written_precision,
 )
 from citefield.verify import parse_value
 
@@ -238,9 +240,9 @@ class _Truth:
     """The reviewed values of one field in one golden output, by match key."""
 
     positives: list[_Positive] = field(default_factory=list)
-    by_key: dict[ScalarValue, _Positive] = field(default_factory=dict)
-    negatives: set[ScalarValue] = field(default_factory=set)
-    excluded: set[ScalarValue] = field(default_factory=set)
+    by_key: dict[Key, _Positive] = field(default_factory=dict)
+    negatives: set[Key] = field(default_factory=set)
+    excluded: set[Key] = field(default_factory=set)
     confirmed_absent: bool = False
 
 
@@ -260,7 +262,7 @@ def _truth(
 ) -> _Truth:
     truth = _Truth(confirmed_absent=g_field.review.status == "confirmed_absent")
 
-    def form_key(form: ScalarValue, what: str) -> ScalarValue:
+    def form_key(form: ScalarValue, what: str) -> Key:
         key = _form_key(fdef, form, config)
         if key is None:
             raise EvalError(
@@ -269,21 +271,28 @@ def _truth(
             )
         return key
 
-    def golden_keys(v: Value) -> set[ScalarValue]:
+    def main_key(v: Value) -> Key:
+        if v.review.status == "edited":
+            return form_key(v.review.reviewed_value, "reviewed value")
+        return _value_key(fdef, v)
+
+    def equivalent_key(main: Key, form: str) -> Key:
+        """A number's equivalents are parsed; those of text, such as a range, stay text."""
+        if isinstance(main, NumberKey):
+            return form_key(form, "equivalent")
+        return match_key(fdef, form)
+
+    def golden_keys(v: Value) -> set[Key]:
         """The reviewed value's match key, and those of its equivalent forms."""
-        main = (
-            form_key(v.review.reviewed_value, "reviewed value")
-            if v.review.status == "edited"
-            else match_key(fdef, v.value, v.raw_value, v.raw_unit)
-        )
-        return {main} | {form_key(e, "equivalent") for e in v.review.equivalents}
+        main = main_key(v)
+        return {main} | {equivalent_key(main, e) for e in v.review.equivalents}
 
     # Values in the prompt's examples measure copying, not extraction.
     truth.excluded = {
         k if (k := _form_key(fdef, e, config)) is not None else match_key(fdef, e)
         for e in fdef.examples
     }
-    equivalents: list[tuple[_Positive, Value]] = []
+    equivalents: list[tuple[_Positive, Key, Value]] = []
     for v in g_field.values:
         review = v.review
         if fdef.type in ("number", "integer") and isinstance(v.value, str):
@@ -297,22 +306,18 @@ def _truth(
                 continue
             seen.add((doc_id, v.value_id))
             # Values with the same main form are one positive, with all their contexts.
-            key = (
-                form_key(review.reviewed_value, "reviewed value")
-                if review.status == "edited"
-                else match_key(fdef, v.value, v.raw_value, v.raw_unit)
-            )
+            key = main_key(v)
             positive = _get(truth.by_key, key)
             if positive is None:
                 positive = truth.by_key[key] = _Positive()
                 truth.positives.append(positive)
             positive.contexts.add(_context(v))
-            equivalents.append((positive, v))
+            equivalents.append((positive, key, v))
         if review.status in ("edited", "rejected"):
-            truth.negatives.add(match_key(fdef, v.value, v.raw_value, v.raw_unit))
-    for positive, v in equivalents:
+            truth.negatives.add(_value_key(fdef, v))
+    for positive, main, v in equivalents:
         for e in v.review.equivalents:
-            key = form_key(e, "equivalent")
+            key = equivalent_key(main, e)
             existing = _get(truth.by_key, key)
             if existing is not None and existing is not positive:
                 raise EvalError(f"{doc_id}: field {fdef.name!r}: {e!r} matches two golden values")
@@ -337,9 +342,9 @@ def _score_field(
     # Predictions grouped by the positive they match, or by key when they match none, so
     # several forms of one golden value count once.
     matched: dict[int, tuple[_Positive, list[Value]]] = {}
-    unmatched: dict[ScalarValue, list[Value]] = {}
+    unmatched: dict[Key, list[Value]] = {}
     for v in p_field.values:
-        key = match_key(fdef, v.value, v.raw_value, v.raw_unit)
+        key = _value_key(fdef, v)
         if _has(truth.excluded, key):
             continue
         positive = _get(truth.by_key, key)
@@ -416,36 +421,51 @@ def _fold(text: str) -> str:
     return _DROP.sub("", text.casefold().translate(_QUOTES)).rstrip("*")
 
 
-def _form_key(fdef: FieldDef, form: ScalarValue, config: Config) -> ScalarValue:
+Key = ScalarValue | NumberKey
+
+
+def _value_key(fdef: FieldDef, v: Value) -> Key:
+    """What a value is compared by: its `NumberKey` for a number, else its match key."""
+    return number_key(v) or match_key(fdef, v.value, v.raw_value, v.raw_unit)
+
+
+def _form_key(fdef: FieldDef, form: ScalarValue, config: Config) -> Key | None:
     """Match key of a form written by hand: an example, an equivalent or a reviewed value.
 
     For a number field, a text form is parsed and converted like a raw value with its unit
     ("516.4 kg"), and None when it doesn't parse (ADR-0021).
     """
-    if fdef.type in ("number", "integer") and isinstance(form, str):
-        locale = config.settings.extraction.number_locale
-        return parse_value(fdef, form, None, locale, config.units).value
-    return match_key(fdef, form)
+    if fdef.type not in ("number", "integer"):
+        return match_key(fdef, form)
+    if not isinstance(form, str):
+        return NumberKey(form) if form is not None else None  # a number, without its text
+    locale = config.settings.extraction.number_locale
+    parsed = parse_value(fdef, form, None, locale, config.units)
+    if parsed.value is None:
+        return None
+    if parsed.status == "derived":
+        return NumberKey(parsed.value, derived=True)
+    return NumberKey(parsed.value, written_precision(form, parsed.value))
 
 
 _MISSING = object()
 
 
-def _find(keys: Collection[ScalarValue], key: ScalarValue, default: object = _MISSING) -> object:
-    """The key in `keys` that `key` matches: itself, or for a number the closest within 1%
-    (ADR-0021); `default` when none does."""
-    if not is_number(key):
+def _find(keys: Collection[Key], key: Key, default: object = _MISSING) -> object:
+    """The key in `keys` that `key` matches: itself, or for a number the closest one that
+    `numbers_match` (ADR-0021); `default` when none does."""
+    if not isinstance(key, NumberKey):
         return key if key in keys else default
-    close = [k for k in keys if is_number(k) and numbers_match(k, key)]
-    return min(close, key=lambda k: abs(k - key)) if close else default
+    close = [k for k in keys if isinstance(k, NumberKey) and numbers_match(k, key)]
+    return min(close, key=lambda k: abs(k.value - key.value)) if close else default
 
 
-def _get(mapping: Mapping[ScalarValue, _Positive], key: ScalarValue) -> _Positive | None:
+def _get(mapping: Mapping[Key, _Positive], key: Key) -> _Positive | None:
     found = _find(mapping, key)
     return None if found is _MISSING else mapping[found]
 
 
-def _has(keys: Collection[ScalarValue], key: ScalarValue) -> bool:
+def _has(keys: Collection[Key], key: Key) -> bool:
     return _find(keys, key) is not _MISSING
 
 

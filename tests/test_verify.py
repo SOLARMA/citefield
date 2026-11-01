@@ -1,6 +1,7 @@
 import pytest
 
 from citefield.config import FieldDef
+from citefield.output import NumberKey, numbers_match, written_precision
 from citefield.verify import (
     NumberParseError,
     clean_unit,
@@ -234,3 +235,39 @@ def test_integer_unit_fields():
 )
 def test_clean_unit(text, expected):
     assert clean_unit(text) == expected
+
+
+@pytest.mark.parametrize(
+    "raw, value, width",
+    [
+        ("1.9", 1.9, 0.05),
+        ("516.4", 516.4, 0.05),
+        (".99", 0.99, 0.005),
+        ("0.050", 0.05, 0.0005),
+        ("1,140", 1140, 0.5),
+        ("1,140", 1.14, 0.0005),  # read as 1.140 under it or de
+        ("-25", -25, 0.5),
+        ("18.92lb", 18.92, 0.005),
+        ("18.92*", 18.92, 0.005),
+        ("5 m3", 5, 0.0),  # other digits in the text
+        ("0", 0, 0.0),
+    ],
+)
+def test_written_precision(raw, value, width):
+    assert written_precision(raw, value) == pytest.approx(width)
+
+
+@pytest.mark.parametrize(
+    "a, b, match",
+    [
+        (NumberKey(516.4, 0.05), NumberKey(517.1, derived=True), True),  # within 1%
+        (NumberKey(1.9, 0.05), NumberKey(1.868, derived=True), True),  # within 1.9's precision
+        (NumberKey(1.868, derived=True), NumberKey(1.9, 0.05), True),
+        (NumberKey(1.9, 0.05), NumberKey(1.96, derived=True), False),
+        (NumberKey(1, 0.5), NumberKey(1.4, 0.05), False),  # both stated: 1% only
+        (NumberKey(1.9), NumberKey(1.868, derived=True), False),  # no text, no precision
+        (NumberKey(2.0, derived=True), NumberKey(2.05, derived=True), False),
+    ],
+)
+def test_numbers_match(a, b, match):
+    assert numbers_match(a, b) is match

@@ -244,6 +244,19 @@ def test_numbers_match_within_one_percent(predicted, tp, fp):
     assert (field.true_positives, field.false_positives) == (tp, fp)
 
 
+def test_a_conversion_matches_within_a_stated_values_precision():
+    field = {"name": "engine_displacement", "description": "x", "type": "number", "unit": "L"}
+    cfg = Config(fields=[field], settings={"llm": {"model": "fake/model"}})
+    name = "engine_displacement"
+    golden = output(**{name: [value(name, "1.9", "accepted", raw_unit="L", parsed=1.9)]})
+    converted = value(name, "114", raw_unit="cu. in.", parsed=1.868)
+    converted.status = "derived"
+    stated_wrong = value(name, "1.868", raw_unit="L", parsed=1.868, context="x")
+    for predicted, tp in (([converted], 1), ([stated_wrong], 0)):
+        result = score([(golden, output(**{name: predicted}))], cfg).fields[0]
+        assert result.true_positives == tp
+
+
 def test_number_forms_written_by_hand_are_parsed():
     golden = output(
         **{
@@ -297,6 +310,14 @@ def unparsed(raw, review="pending"):
     v = weight(raw, None, review)
     v.value = None  # a range keeps value null (ADR-0020)
     return v
+
+
+def test_equivalents_of_a_range_are_text():
+    golden = unparsed("25-60", "accepted")
+    golden.review.equivalents = ["172-414"]
+    predicted = output(**{W: [unparsed("172-414")]})
+    field = score([(output(**{W: [golden]}), predicted)], number_config()).fields[0]
+    assert field.true_positives == 1
 
 
 def test_unparsed_numbers_match_by_text():

@@ -1,3 +1,4 @@
+import pytest
 from pdfgen import write_pdf
 
 from citefield.cli import main
@@ -81,3 +82,17 @@ def test_eval_scores_saved_predictions(tmp_path, capsys):
 
     assert main(["eval", str(tmp_path / "missing"), "-c", str(config)]) == 1
     assert "not a directory" in capsys.readouterr().err
+
+
+def test_help_hides_unbuilt_commands_and_flags(capsys):
+    for argv, shown in (
+        (["--help"], "validate-config"),
+        (["extract", "--help"], "--dry-run"),
+        (["eval", "--help"], "--predictions"),
+    ):
+        with pytest.raises(SystemExit):
+            main(argv)
+        out = capsys.readouterr().out
+        assert shown in out, argv
+        for hidden in ("reextract", "proposals", "--workers", "--parser", "SUPPRESS"):
+            assert hidden not in out, (argv, hidden)

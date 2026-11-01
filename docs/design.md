@@ -385,6 +385,8 @@ class Completion:
 | `citefield proposals report out/`                        | Count recurring proposals across outputs, ready to promote into the config.            |
 | `citefield eval golden/ -c fields.yaml [--predictions out/] [--documents dir/] [--json report.json]` | Evaluate against the golden set, extracting again or scoring saved outputs. |
 
+`reextract`, `proposals report`, `extract --workers` and `eval --parser` aren't built yet. They are left out of `--help` until the slice that implements them: the two commands exit with status 2, `--parser` is an error and `--workers` is ignored. A step-by-step walk through the working commands is in the [getting-started guide](guides/getting-started.md).
+
 **Module layout**
 
 ```
